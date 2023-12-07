@@ -8,6 +8,9 @@ from apps.event.schemas import (
 )
 import os
 import pandas as pd
+import segno
+from dotenv import load_dotenv
+load_dotenv()
 
 class EventHelpers:
     def __init__(
@@ -87,6 +90,14 @@ class EventRegistrationHelpers:
         event_registration_id.save()
         return event_registration_id
 
-    def generate_qr_code(self):
-        print("Generate")
+    def generate_qr_code(self, message=""):
+        qrcode = segno.make_qr(
+            message,
+        )
+        filename = "sample.png"
+        store_path = os.path.join( os.getenv('QR_PATH'), filename)
+        qrcode.save(
+            store_path,
+            scale=10,
+        )
     

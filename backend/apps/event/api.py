@@ -105,4 +105,21 @@ class EventRegistrationApi(MethodResource):
                 mimetype='application/json'
             )
         
+    def get(self, **kwargs):
+        try:
+            param = dict()
+            args = request.args
+            param['api'] = "/api/v1/event-registration"
+            param['method'] = "GET"
+            # result = EventRegistrationHelpers(**param).create(kwargs)
+            return True
+        except Exception as e:
+            print(e)
+            return Response(
+                json.dumps(str(e)),
+                status=http.client.INTERNAL_SERVER_ERROR,
+                mimetype='application/json'
+            )
+
+        
     

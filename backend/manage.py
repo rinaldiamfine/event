@@ -33,5 +33,12 @@ def celery_status():
     }
     return result
 
+@manager.command
+def qr():
+    from apps.event.helpers import (
+        EventRegistrationHelpers
+    )
+    EventRegistrationHelpers().generate_qr_code()
+
 if __name__ == '__main__':
     manager.run()
