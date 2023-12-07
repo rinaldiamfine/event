@@ -17,7 +17,6 @@ click-plugins==1.1.1
 click-repl==0.2.0
 clikit==0.6.2
 crashtest==0.3.1
-dataclasses==0.8
 distlib==0.3.6
 filelock==3.4.1
 Flask==1.1.1
