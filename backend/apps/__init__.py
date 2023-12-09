@@ -1,13 +1,20 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 from celery import Celery
 from flask_caching import Cache
 from dotenv import load_dotenv
 from flask_marshmallow import Marshmallow
 from apps.blueprint_loaders import BlueprintLoaders
 
+from apispec import APISpec
+from apispec.ext.marshmallow import MarshmallowPlugin
+from flask_apispec.extension import FlaskApiSpec
+
 app = Flask(__name__)
+## need to set the cors
+CORS(app)
 
 load_dotenv()
 app.debug = os.getenv("FLASK_DEBUG")
@@ -60,6 +67,7 @@ for blueprint in loader:
         app.register_blueprint(blueprint)
         successful_imports.append(blueprint)
     except Exception as e:
+        print(e, "FAILED")
         failed_imports.append(blueprint)
 
 # from akpusdafil.helpers.campaign_report import CampaignReport

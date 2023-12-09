@@ -2,14 +2,29 @@ from marshmallow import Schema, ValidationError, fields, validates
 from marshmallow_enum import EnumField
 from apps import ma
 from apps.event.models import (
-    Event,
-    EventRegistration
+    EventModel,
+    EventLineModel,
+    EventRegistrationModel,
+    EventSouvenirClaimModel
 )
 
 class EventSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = Event
+        model = EventModel
+
+class EventListSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = EventModel
+    
+
+class EventLineSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = EventLineModel
 
 class EventRegistrationSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = EventRegistration
+        model = EventRegistrationModel
+
+class EventSouvenirClaimModel(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = EventSouvenirClaimModel

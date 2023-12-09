@@ -3,13 +3,19 @@ from sqlalchemy.orm import relationship
 import sqlalchemy as sa
 from apps import db
 
-class Event(BaseModel):
-    __tablename__ = 'event'
+class EventModel(BaseModel):
+    __tablename__ = 'events'
 
     code = sa.Column(sa.String(50), nullable=False)
     name = sa.Column(sa.String(50), nullable=False)
-    registration_ids = relationship("EventRegistration", back_populates="event")
-
+    sequence = sa.Column(sa.Integer(), nullable=False)
+    event_date = sa.Column(sa.DateTime())
+    created_uid = sa.Column(sa.Integer(), nullable=False)
+    updated_uid = sa.Column(sa.Integer(), nullable=False)
+    is_deleted = sa.Column(sa.Boolean)
+    invitation_ids = relationship("EventInvitationModel", back_populates="event")
+    registration_ids = relationship("EventRegistrationModel", back_populates="event")
+    event_line_ids = relationship("EventLineModel", back_populates="event")
 
     def __repr__(self):
         return '<id : %s>' % (self.id)
@@ -44,19 +50,159 @@ class Event(BaseModel):
             db.session.rollback()
             raise Exception(e)
         
+class EventLineModel(BaseModel):
+    __tablename__ = 'event_lines'
 
-class EventRegistration(BaseModel):
-    __tablename__ = 'event_registration'
+    event_id = sa.Column(sa.Integer(), sa.ForeignKey('events.id', ondelete='CASCADE'), nullable=False)
+    event = relationship("EventModel", back_populates="event_line_ids")
+    name = sa.Column(sa.String(50), nullable=False)
+    souvenir_cupons = sa.Column(sa.Integer(), nullable=True)
+    created_uid = sa.Column(sa.Integer(), nullable=False)
+    updated_uid = sa.Column(sa.Integer(), nullable=False)
+    souvenir_claim_ids = relationship("EventSouvenirClaimModel", back_populates="event_line")
 
-    event_id = sa.Column(sa.Integer(), sa.ForeignKey('event.id', ondelete='CASCADE'), nullable=False)
-    event = relationship("Event", back_populates="registration_ids")
+    def __repr__(self):
+        return '<id : %s>' % (self.id)
 
-    reg_no = sa.Column(sa.String(50), nullable=False)
+    def save(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return self
+
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(e)
+
+    def add_flush(self):
+        try:
+            db.session.add(self)
+            db.session.flush()
+            return self
+
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(e)
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(e)
+        
+class EventInvitationModel(BaseModel):
+    __tablename__ = 'event_invitations'
+
+    event_id = sa.Column(sa.Integer(), sa.ForeignKey('events.id', ondelete='CASCADE'), nullable=False)
+    event = relationship("EventModel", back_populates="invitation_ids")
     name = sa.Column(sa.String(50), nullable=False)
     email = sa.Column(sa.String(150), nullable=False)
-    phone = sa.Column(sa.String(20), nullable=False)
+    phone = sa.Column(sa.String(20), nullable=True)
     is_on_behalf = sa.Column(sa.Boolean, default=False)
-    on_behalf = sa.Column(sa.String(50), nullable=False)
+    on_behalf = sa.Column(sa.String(50), nullable=True)
+    created_uid = sa.Column(sa.Integer(), nullable=False)
+    updated_uid = sa.Column(sa.Integer(), nullable=False)
+
+    def __repr__(self):
+        return '<id : %s>' % (self.id)
+
+    def save(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return self
+
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(e)
+
+    def add_flush(self):
+        try:
+            db.session.add(self)
+            db.session.flush()
+            return self
+
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(e)
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(e)
+        
+class EventRegistrationModel(BaseModel):
+    __tablename__ = 'event_registrations'
+
+    event_id = sa.Column(sa.Integer(), sa.ForeignKey('events.id', ondelete='CASCADE'), nullable=False)
+    event = relationship("EventModel", back_populates="registration_ids")
+    reg_no = sa.Column(sa.String(50), nullable=True)
+    name = sa.Column(sa.String(50), nullable=False)
+    email = sa.Column(sa.String(150), nullable=False)
+    phone = sa.Column(sa.String(20), nullable=True)
+    is_on_behalf = sa.Column(sa.Boolean, default=False)
+    on_behalf = sa.Column(sa.String(50), nullable=True)
+    created_uid = sa.Column(sa.Integer(), nullable=False)
+    updated_uid = sa.Column(sa.Integer(), nullable=False)
+    souvenir_claim_ids = relationship("EventSouvenirClaimModel", back_populates="event_registration")
+
+    def __repr__(self):
+        return '<id : %s>' % (self.id)
+
+    def save(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return self
+
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(e)
+
+    def add_flush(self):
+        try:
+            db.session.add(self)
+            db.session.flush()
+            return self
+
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(e)
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(e)
+        
+class EventSouvenirClaimModel(BaseModel):
+    __tablename__ = 'event_souvenir_claims'
+
+    event_registration_id = sa.Column(sa.Integer(), sa.ForeignKey('event_registrations.id', ondelete='CASCADE'), nullable=False)
+    event_registration = relationship("EventRegistrationModel", back_populates="souvenir_claim_ids")
+    event_line_id = sa.Column(sa.Integer(), sa.ForeignKey('event_lines.id', ondelete='CASCADE'), nullable=False)
+    event_line = relationship("EventLineModel", back_populates="souvenir_claim_ids")
+    reg_no = sa.Column(sa.String(50), nullable=True)
+    name = sa.Column(sa.String(50), nullable=False)
+    email = sa.Column(sa.String(150), nullable=False)
+    phone = sa.Column(sa.String(20), nullable=True)
+    is_on_behalf = sa.Column(sa.Boolean, default=False)
+    on_behalf = sa.Column(sa.String(50), nullable=True)
+    created_uid = sa.Column(sa.Integer(), nullable=False)
+    updated_uid = sa.Column(sa.Integer(), nullable=False)
 
     def __repr__(self):
         return '<id : %s>' % (self.id)

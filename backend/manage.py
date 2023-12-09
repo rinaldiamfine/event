@@ -40,5 +40,12 @@ def qr():
     )
     EventRegistrationHelpers().generate_qr_code()
 
+@manager.command
+def sent_invitation():
+    from apps.event.helpers import (
+        EventHelpers
+    )
+    EventHelpers().sent_invitation(event_id=1)
+    
 if __name__ == '__main__':
     manager.run()
