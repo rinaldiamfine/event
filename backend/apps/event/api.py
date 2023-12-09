@@ -3,11 +3,13 @@ from apps import app
 from flask_apispec import MethodResource, marshal_with, use_kwargs
 from apps.event.helpers import (
     EventHelpers,
+    EventLineHelpers,
     EventRegistrationHelpers
 )
 from apps.event.schemas import (
     EventSchema,
-    EventRegistrationSchema
+    EventLineSchema,
+    EventRegistrationSchema,
 )
 from flask import Response, request
 from marshmallow import fields
@@ -23,7 +25,9 @@ class EventApi(MethodResource):
     @use_kwargs({
         "name": fields.Str(),
         "code": fields.Str(),
-        "event_date": fields.DateTime()
+        "venue": fields.Str(),
+        "event_date": fields.DateTime(),
+        "event_time": fields.Str(),
     })
     @marshal_with(EventSchema)
     def post(self, **kwargs):
@@ -49,8 +53,25 @@ class EventApi(MethodResource):
     
 
 class EventLineApi(MethodResource):
+    @use_kwargs({
+        "name": fields.Str(),
+        "event_id": fields.Int(),
+        "souvenir_cupons": fields.Int(),
+    })
+    @marshal_with(EventLineSchema)
     def post(self, **kwargs):
-        print("LALA", kwargs)
+        try:
+            param = dict()
+            param['api'] = "/api/v1/event-lines"
+            param['method'] = "POST"
+            status, result = EventLineHelpers(**param).create(kwargs)
+            return result
+        except Exception as e:
+            return Response(
+                json.dumps(str(e)),
+                status=http.client.INTERNAL_SERVER_ERROR,
+                mimetype='application/json'
+            )
 
 
 class EventRegistrationApi(MethodResource):

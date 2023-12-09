@@ -21,6 +21,7 @@ def upgrade():
         sa.Column('created', sa.DateTime(), nullable=True),
         sa.Column('updated', sa.DateTime(), nullable=True),
         sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('uuid', sa.String(), nullable=False),
         sa.Column("event_id", sa.Integer, sa.ForeignKey("events.id"), nullable=False),
         sa.Column('reg_no', sa.String(length=50), nullable=True),
         sa.Column('name', sa.String(length=50), nullable=False),

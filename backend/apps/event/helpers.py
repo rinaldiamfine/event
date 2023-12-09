@@ -1,5 +1,20 @@
+from jinja2 import Environment, FileSystemLoader
+import os
+import uuid
+import base64
+import pandas as pd
+import segno
+from dotenv import load_dotenv
+from datetime import datetime
+from sqlalchemy import and_, or_
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.utils import formataddr
+from apps.tools.email import EmailManager
+load_dotenv()
 from apps.event.models import (
     EventModel,
+    EventLineModel,
     EventInvitationModel,
     EventRegistrationModel,
 )
@@ -7,16 +22,8 @@ from apps.event.schemas import (
     # Events
     EventSchema,
     EventListSchema,
-
     EventRegistrationSchema,
 )
-import os
-import base64
-import pandas as pd
-import segno
-from dotenv import load_dotenv
-from datetime import datetime
-load_dotenv()
 
 class EventHelpers:
     def __init__(
@@ -29,7 +36,12 @@ class EventHelpers:
 
     def read(self, params: dict):
         # session.query(MyClass).filter(MyClass.name == 'some name')
-        query_event_ids = EventModel.base_query()
+        query_event_ids = EventModel.query.filter(
+            or_(
+                EventModel.is_deleted==False,
+                EventModel.is_deleted==None,
+            )
+        )
         if (params['keywords'] != ''):
             query_event_ids = query_event_ids.filter(
                 EventModel.name == params['keywords'],
@@ -56,7 +68,8 @@ class EventHelpers:
             event_id = EventModel(
                 name=values.get('name'),
                 code=values.get('code'),
-                sequence=1,
+                venue=values.get('venue'),
+                event_time=values.get('event_time'),
                 event_date=values.get('event_date'),
                 created_uid=0,
                 updated_uid=0
@@ -86,19 +99,71 @@ class EventHelpers:
         event_id.update(**values)
         return event_id
 
-    def sent_invitation(self, event_id=0):
+    def sent_email_invitation(self, event=0):
         print("send email invitations")
-        print("event_id:", event_id)
-        query_event_invitation_ids = EventModel().base_query().first()
-        event_invitation_ids = query_event_invitation_ids
-        print(event_invitation_ids)
+        print("event_id:", event)
+        event_id = EventModel.query.filter(
+            EventModel.id==event,
+            or_(
+                EventModel.is_deleted==False,
+                EventModel.is_deleted==None,
+            )
+        ).first()
+        query_event_invitation_ids = EventInvitationModel.query.filter(
+            or_(
+                EventInvitationModel.is_deleted==False,
+                EventInvitationModel.is_deleted==None,
+            ),
+            EventInvitationModel.event_id==event
+        )
+        event_invitation_ids = query_event_invitation_ids.all()
+        email_manager = EmailManager()
+        load_path = os.path.join(os.getenv('BASE_PATH'), "apps", "templates")
+        file_load_env = Environment(
+            loader=FileSystemLoader(load_path)
+        )
+        email_template = file_load_env.get_template('email_invitation.html')
+        for invitation in event_invitation_ids:
+            print("invitation to:", invitation.email)
+            template_data = {
+                "username": invitation.name,
+                "event_name": event_id.name,
+                "event_date": event_id.event_date.strftime("%d %B %Y"),
+                "event_time": event_id.event_time,
+                "event_venue": event_id.venue,
+                "event_line_ids": event_id.event_line_ids,
+                "current_year": str(datetime.now().year),
+                "reservation_link": "---"
+            }
+            template_render = email_template.render(
+                template_data
+            )
+            message = MIMEMultipart()
+            message['To'] = invitation.email
+            message['Subject'] = "Invitation - {}".format(event_id.name)
+            message['From'] = formataddr(("Admin Event {}".format(event_id.code), email_manager.user))
+            message.attach(MIMEText(template_render, "html"))
+            email_manager.send_email(message)
 
 class EventLineHelpers:
-    def __init__(self):
-        pass
+    def __init__(
+        self,
+        api=None,
+        method=None,
+    ):
+        self.api = api
+        self.method = method
 
     def create(self, values: dict):
-        pass
+        event_line_id = EventLineModel(
+            event_id=values.get('event_id'),
+            name=values.get('name'),
+            souvenir_cupons=values.get('souvenir_cupons'),
+            created_uid=0,
+            updated_uid=0
+        )
+        event_line_id.save()
+        return True, event_line_id
 
 class EventRegistrationHelpers:
     def __init__(
@@ -110,28 +175,70 @@ class EventRegistrationHelpers:
         self.method = method
 
     def create(self, values: dict):
-        event_id = EventModel.base_query().filter_by(
-            id=values.get('event_id'),
+        event_id = EventModel.query.filter(
+            EventModel.id==values.get('event_id'),
+            or_(
+                EventModel.is_deleted==False,
+                EventModel.is_deleted==None,
+            )
         ).first()
-        ## 12IDF2300001
-        reg_no = "{}{}{}{}".format(
-            event_id.start_date.month,
+        reg_no = "{}{}{}".format(
+            ## 12IDF2300001
+            event_id.event_date.month,
             event_id.code,
-            event_id.start_date.year,
-            event_id.sequence.zfill(5)
+            str(event_id.sequence).zfill(5)
         )
         event_registration_id = EventRegistrationModel(
             event_id=values.get('event_id'),
             name=values.get('name'),
+            uuid=uuid.uuid4(),
             reg_no=reg_no,
             email=values.get('email'),
             phone=values.get('phone'),
             is_on_behalf=values.get('is_on_behalf'),
             on_behalf=values.get('on_behalf'),
+            created_uid=0,
+            updated_uid=0
         )
-        event_registration_id.save()
+
+        ## Generate QR-Code
+        self.generate_qr_code(
+            message="{}".format(event_registration_id.reg_no),
+            event_id=event_id.id,
+            uuid=event_registration_id.uuid
+        )
         event_id.sequence += 1
         event_id.save()
+        event_registration_id.save()
+
+        ## Send succesfully registration on email message
+        email_manager = EmailManager()
+        load_path = os.path.join(os.getenv('BASE_PATH'), "apps", "templates")
+        file_load_env = Environment(
+            loader=FileSystemLoader(load_path)
+        )
+        email_template = file_load_env.get_template('email_registration.html')
+        filename = "{}.png".format(event_registration_id.uuid)
+        qr_store_path = os.path.join('qr-events', str(event_id.id), filename)
+        template_data = {
+            "qr_code_link": "{}/{}".format(os.getenv('APP_EVENT_URL'), qr_store_path),
+            "registration_no": event_registration_id.reg_no,
+            "username": event_registration_id.name,
+            "event_name": event_id.name,
+            "event_date": event_id.event_date.strftime("%d %B %Y"),
+            "event_time": event_id.event_time,
+            "event_venue": event_id.venue,
+            "current_year": str(datetime.now().year),
+        }
+        template_render = email_template.render(
+            template_data
+        )
+        message = MIMEMultipart()
+        message['To'] = event_registration_id.email
+        message['Subject'] = "RSVP - {}".format(event_id.name)
+        message['From'] = formataddr(("Admin Event {}".format(event_id.code), email_manager.user))
+        message.attach(MIMEText(template_render, "html"))
+        email_manager.send_email(message)
         return event_registration_id
     
     def create_qr(self, values):
@@ -143,7 +250,7 @@ class EventRegistrationHelpers:
         self.generate_qr_code(
             message="{}".format(event_registration_id.reg_no),
             event_id=values.get('event_id'),
-            registration_id=event_registration_id.id
+            uuid=""
         )
         return True
     
@@ -157,12 +264,12 @@ class EventRegistrationHelpers:
             os.mkdir(path_dir)
             return True
 
-    def generate_qr_code(self, message="", event_id=0, registration_id=0):
+    def generate_qr_code(self, message="", event_id=0, uuid="0"):
         qrcode = segno.make_qr(
             message,
         )
         self.check_path(event_id)
-        filename = "{}.png".format(str(registration_id))
+        filename = "{}.png".format(uuid)
         store_path = os.path.join( os.getenv('QR_PATH'), str(event_id), filename)
         qrcode.save(
             store_path,

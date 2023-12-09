@@ -15,7 +15,7 @@ event_line_blueprint = Blueprint(
     'Event Lines', __name__, url_prefix='/api/v1/event-lines'
 )
 event_registration_blueprint = Blueprint(
-    'Event Registration', __name__, url_prefix='/api/v1/event-registration'
+    'Event Registration', __name__, url_prefix='/api/v1/event-registrations'
 )
 
 event_api = Api(event_blueprint)

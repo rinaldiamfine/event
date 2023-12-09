@@ -26,6 +26,8 @@ def upgrade():
         sa.Column('code', sa.String(length=50), nullable=False),
         sa.Column('sequence', sa.Integer()),
         sa.Column('event_date', sa.DateTime()),
+        sa.Column('event_time', sa.String(length=50)),
+        sa.Column('venue', sa.String(length=50)),
         sa.Column('created_uid', sa.Integer(), nullable=False),
         sa.Column('updated_uid', sa.Integer(), nullable=False),
         sa.Column('is_deleted', sa.Boolean(), nullable=True),

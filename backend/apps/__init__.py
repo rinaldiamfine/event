@@ -7,6 +7,7 @@ from flask_caching import Cache
 from dotenv import load_dotenv
 from flask_marshmallow import Marshmallow
 from apps.blueprint_loaders import BlueprintLoaders
+from flask_sock import Sock
 
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
@@ -19,6 +20,7 @@ CORS(app)
 load_dotenv()
 app.debug = os.getenv("FLASK_DEBUG")
 app.env = os.getenv("FLASK_ENV")
+sock = Sock(app)
 
 SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
 SQLALCHEMY_BINDS = {

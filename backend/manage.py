@@ -2,10 +2,7 @@
 # coding: utf-8
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-
 from apps import app, db, celery
-# from noah.models import *
-
 migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
@@ -34,18 +31,13 @@ def celery_status():
     return result
 
 @manager.command
-def qr():
-    from apps.event.helpers import (
-        EventRegistrationHelpers
-    )
-    EventRegistrationHelpers().generate_qr_code()
-
-@manager.command
-def sent_invitation():
+@manager.option('-e', '--event', dest='event', default=0)
+def sent_invitation(event):
     from apps.event.helpers import (
         EventHelpers
     )
-    EventHelpers().sent_invitation(event_id=1)
+    EventHelpers().sent_email_invitation(event=event)
+
     
 if __name__ == '__main__':
     manager.run()

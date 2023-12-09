@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <title>Event Invitation</title>
+    <title>Event Registration</title>
 </head>
 
 <body class="body-wrapper" style="margin: 0;">
@@ -33,25 +33,30 @@
                                         <tbody>
                                             <tr>
                                                 <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
-                                                    <h4>{{ event_name }},</h4>
-                                                    <p>Dear {{ username }},</p>
-                                                    <p>We are delighted to extend an invitation to you for the upcoming Indonesia Development Forum 2023, a platform that brings together thought leaders, policymakers, and innovators to discuss and shape the future of development in Indonesia.</p>
+                                                    <h4>Dear {{ username }},</h4>
+                                                    <p>Congratulations! Your reservation for the {{ event_name }} has been successfully confirmed.</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
+                                                    <hr style="margin-top:24px;border:0;border-bottom:1px solid #c1c7d0">
+                                                    <img src="{{ qr_code_link }}"/>
+                                                    <p style="margin-top:0px;">
+                                                        <b>{{ registration_no }}</b>
+                                                    </p>
+                                                    <hr style="margin-top:24px;border:0;border-bottom:1px solid #c1c7d0">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
+                                                    <p>Event Details:</p>
                                                     <p>
                                                         Date: {{ event_date }}<br/>
                                                         Time: {{ event_time }}<br/>
                                                         Venue: {{ event_venue }}
                                                     </p>
-                                                    <p>Agenda Highlights:</p>
-                                                    <ul>
-                                                        {% for event_line in event_line_ids %}
-                                                            <li>{{ event_line['name'] }}</li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                    <p>Your Confirmation is Requested:</p>
-                                                    <p>Please confirm your attendance by {{ event_date }} to secure your place at this influential gathering. Your presence will contribute to the exchange of ideas that will drive positive change in Indonesia.</p>
-                                                    <p>RSVP Options:</p>
-                                                    <a href="{{ reservation_link }}" target="_blank" style="background-color: #0146A0;padding:8px 13px;color:white;text-decoration: none;border-radius: 5px;">Link RSVP</a>
-                                                    <p>Join us as we explore, engage, and envision a brighter future for Indonesia. We look forward to your participation in this vital conversation.</p>
+                                                    <p>Thank you for choosing to be part of this influential event. We look forward to your valuable contribution to the discussions on shaping the future of development in Indonesia.</p>
+                                                    <p>For any further inquiries, please feel free to contact us at info@gmail.com</p>
                                                 </td>
                                             </tr>
                                             <tr>
