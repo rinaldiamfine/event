@@ -198,12 +198,7 @@ class EventSouvenirClaimModel(BaseModel):
     event_registration = relationship("EventRegistrationModel", back_populates="souvenir_claim_ids")
     event_line_id = sa.Column(sa.Integer(), sa.ForeignKey('event_lines.id', ondelete='CASCADE'), nullable=False)
     event_line = relationship("EventLineModel", back_populates="souvenir_claim_ids")
-    reg_no = sa.Column(sa.String(50), nullable=True)
-    name = sa.Column(sa.String(50), nullable=False)
-    email = sa.Column(sa.String(150), nullable=False)
-    phone = sa.Column(sa.String(20), nullable=True)
-    is_on_behalf = sa.Column(sa.Boolean, default=False)
-    on_behalf = sa.Column(sa.String(50), nullable=True)
+    date_claim = sa.Column(sa.DateTime(), nullable=False)
     created_uid = sa.Column(sa.Integer(), nullable=False)
     updated_uid = sa.Column(sa.Integer(), nullable=False)
 
@@ -239,3 +234,4 @@ class EventSouvenirClaimModel(BaseModel):
         except Exception as e:
             db.session.rollback()
             raise Exception(e)
+        

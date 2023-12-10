@@ -21,8 +21,10 @@ from apps.event.models import (
 from apps.event.schemas import (
     # Events
     EventSchema,
-    EventListSchema,
+    ListEventSchema,
+
     EventRegistrationSchema,
+    ListEventRegistrationSchema
 )
 
 class EventHelpers:
@@ -34,7 +36,7 @@ class EventHelpers:
         self.api = api
         self.method = method
 
-    def read(self, params: dict):
+    def list(self, params: dict):
         # session.query(MyClass).filter(MyClass.name == 'some name')
         query_event_ids = EventModel.query.filter(
             or_(
@@ -52,7 +54,7 @@ class EventHelpers:
             params['limit']
         )
         event_ids = query_event_ids.all()
-        result_dump = EventSchema(many=True).dump(event_ids)
+        result_dump = ListEventSchema(many=True).dump(event_ids)
         print(result_dump)
         result = {
             "data": result_dump,
@@ -277,23 +279,29 @@ class EventRegistrationHelpers:
         )
         return True
 
-    def registration_detail(self, args):
-        print("", args)
-        event_reg_id = EventRegistrationModel.base_query().filter_by(
-            id=args.get('reg_id'),
-            event_id=args.get('event_id')
-        ).first()
-        filename = "{}.png".format(str(args.get('reg_id')))
-        store_path = os.path.join( os.getenv('QR_PATH'), str(args.get('event_id')), filename)
-        with open(store_path, 'rb') as image_file:
-            base64_bytes = base64.b64encode(image_file.read())
-            base64_string = base64_bytes.decode()
-            qr_code = base64_string
+    def list(self, params: dict):
+        print("", params)
+        query_event_registration_ids = EventRegistrationModel.query.filter(
+            or_(
+                EventRegistrationModel.is_deleted==False,
+                EventRegistrationModel.is_deleted==None,
+            )
+        )
+        query_event_registration_ids = query_event_registration_ids.offset(
+            params['offset']
+        ).limit(
+            params['limit']
+        )
+        event_registration_ids = query_event_registration_ids.all()
+        print(event_registration_ids)
+        result_dump = ListEventRegistrationSchema(many=True).dump(event_registration_ids)
 
-        return True, {
-            "name": event_reg_id.name,
-            "email": event_reg_id.email,
-            "phone": event_reg_id.phone,
-            "qr_code": qr_code,
+        result = {
+            "data": result_dump,
+            "limit": params.get('limit'),
+            "offset": params.get('offset'),
+            "keywords": params['keywords'] if params.get('keywords') else '',
+            "total": len(event_registration_ids)
         }
+        return True, result
     

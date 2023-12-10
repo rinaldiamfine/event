@@ -10,6 +10,7 @@ from apps.event.schemas import (
     EventSchema,
     EventLineSchema,
     EventRegistrationSchema,
+    ListEventRegistrationSchema
 )
 from flask import Response, request
 from marshmallow import fields
@@ -48,7 +49,7 @@ class EventApi(MethodResource):
         print(kwargs)
         params = request.args.to_dict()
         print(params)
-        status, result =  EventHelpers().read(params)
+        status, result =  EventHelpers().list(params)
         return result
     
 
@@ -87,7 +88,7 @@ class EventRegistrationApi(MethodResource):
     def post(self, **kwargs):
         try:
             param = dict()
-            param['api'] = "/api/v1/event-registration"
+            param['api'] = "/api/v1/event-registrations"
             param['method'] = "POST"
             args = request.args
             result = EventRegistrationHelpers(**param).create(kwargs)
@@ -100,33 +101,40 @@ class EventRegistrationApi(MethodResource):
                 mimetype='application/json'
             )
         
-    @use_kwargs({
-        "event_id": fields.Int(),
-        "reg_id": fields.Int(),
-    })
-    def put(self, **kwargs):
-        try:
-            param = dict()
-            args = request.args
-            param['api'] = "/api/v1/event-registration"
-            param['method'] = "PUT"
-            print(kwargs)
-            result = EventRegistrationHelpers(**param).create_qr(args)
-            return result
-        except Exception as e:
-            return Response(
-                json.dumps(str(e)),
-                status=http.client.INTERNAL_SERVER_ERROR,
-                mimetype='application/json'
-            )
+    # @use_kwargs({
+    #     "event_id": fields.Int(),
+    #     "reg_id": fields.Int(),
+    # })
+    # def put(self, **kwargs):
+    #     try:
+    #         param = dict()
+    #         args = request.args
+    #         param['api'] = "/api/v1/event-registration"
+    #         param['method'] = "PUT"
+    #         print(kwargs)
+    #         result = EventRegistrationHelpers(**param).create_qr(args)
+    #         return result
+    #     except Exception as e:
+    #         return Response(
+    #             json.dumps(str(e)),
+    #             status=http.client.INTERNAL_SERVER_ERROR,
+    #             mimetype='application/json'
+    #         )
         
+    @use_kwargs({
+        "is_attendance": fields.Bool(),
+        "offset": fields.Str(),
+        "limit": fields.Str(),
+        "keywords": fields.Str(),
+    }, locations=['query'])
+    @marshal_with(ListEventRegistrationSchema)
     def get(self, **kwargs):
         try:
             param = dict()
             args = request.args
-            param['api'] = "/api/v1/event-registration"
+            param['api'] = "/api/v1/event-registrations"
             param['method'] = "GET"
-            status, result = EventRegistrationHelpers(**param).registration_detail(args.to_dict())
+            status, result = EventRegistrationHelpers(**param).list(args.to_dict())
             return result
         except Exception as e:
             print(e)
@@ -137,3 +145,24 @@ class EventRegistrationApi(MethodResource):
             )
         
     ## PUT or PATCH for scan
+
+class EventLineApi(MethodResource):
+    @use_kwargs({
+        "name": fields.Str(),
+        "event_id": fields.Int(),
+        "souvenir_cupons": fields.Int(),
+    })
+    @marshal_with(EventLineSchema)
+    def post(self, **kwargs):
+        try:
+            param = dict()
+            param['api'] = "/api/v1/event-lines"
+            param['method'] = "POST"
+            status, result = EventLineHelpers(**param).create(kwargs)
+            return result
+        except Exception as e:
+            return Response(
+                json.dumps(str(e)),
+                status=http.client.INTERNAL_SERVER_ERROR,
+                mimetype='application/json'
+            )

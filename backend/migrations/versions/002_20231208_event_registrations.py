@@ -31,6 +31,8 @@ def upgrade():
         sa.Column('on_behalf', sa.String(length=50), nullable=True),
         sa.Column('created_uid', sa.Integer(), nullable=False),
         sa.Column('updated_uid', sa.Integer(), nullable=False),
+        sa.Column('is_attendance', sa.Boolean(), nullable=True),
+        sa.Column('date_attendance', sa.DateTime(), nullable=True),
         sa.Column('is_deleted', sa.Boolean(), nullable=True),
         sa.Column('deleted', sa.DateTime(), nullable=True),
         sa.PrimaryKeyConstraint('id')

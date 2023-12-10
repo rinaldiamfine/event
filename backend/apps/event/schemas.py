@@ -12,7 +12,7 @@ class EventSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = EventModel
 
-class EventListSchema(ma.SQLAlchemyAutoSchema):
+class ListEventSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = EventModel
     
@@ -21,7 +21,18 @@ class EventLineSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = EventLineModel
 
+
 class EventRegistrationSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = EventRegistrationModel
+
+class ListEventRegistrationSchema(ma.SQLAlchemyAutoSchema):
+    data = fields.Nested(EventRegistrationSchema, many=True)
+    limit = fields.Int(allow_none=True)
+    offset = fields.Int(allow_none=True)
+    keywords = fields.Str(allow_none=True)
+    total = fields.Int()
+
     class Meta:
         model = EventRegistrationModel
 
