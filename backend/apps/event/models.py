@@ -2,6 +2,11 @@ from apps.tools.base_model import BaseModel
 from sqlalchemy.orm import relationship
 import sqlalchemy as sa
 from apps import db
+from enum import Enum
+
+class RegistrationType(Enum):
+    AUDIENCE = u'Audience'
+    SPEAKER = u'Speaker'
 
 class EventModel(BaseModel):
     __tablename__ = 'events'
@@ -104,7 +109,6 @@ class EventInvitationModel(BaseModel):
     name = sa.Column(sa.String(50), nullable=False)
     email = sa.Column(sa.String(150), nullable=False)
     phone = sa.Column(sa.String(20), nullable=True)
-    is_on_behalf = sa.Column(sa.Boolean, default=False)
     on_behalf = sa.Column(sa.String(50), nullable=True)
     created_uid = sa.Column(sa.Integer(), nullable=False)
     updated_uid = sa.Column(sa.Integer(), nullable=False)
@@ -147,12 +151,12 @@ class EventRegistrationModel(BaseModel):
 
     event_id = sa.Column(sa.Integer(), sa.ForeignKey('events.id', ondelete='CASCADE'), nullable=False)
     event = relationship("EventModel", back_populates="registration_ids")
-    reg_no = sa.Column(sa.String(50), nullable=True)
+    registration_id = sa.Column(sa.String(50), nullable=True)
+    registration_type = sa.Column(sa.Enum(RegistrationType, name='registration_type'))
     uuid = sa.Column(sa.String(50), nullable=True)
     name = sa.Column(sa.String(50), nullable=False)
     email = sa.Column(sa.String(150), nullable=False)
     phone = sa.Column(sa.String(20), nullable=True)
-    is_on_behalf = sa.Column(sa.Boolean, default=False)
     on_behalf = sa.Column(sa.String(50), nullable=True)
     created_uid = sa.Column(sa.Integer(), nullable=False)
     updated_uid = sa.Column(sa.Integer(), nullable=False)

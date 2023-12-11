@@ -5,7 +5,9 @@ from apps.event.models import (
     EventModel,
     EventLineModel,
     EventRegistrationModel,
-    EventSouvenirClaimModel
+    EventSouvenirClaimModel,
+    # Enum
+    RegistrationType
 )
 
 class EventSchema(ma.SQLAlchemyAutoSchema):
@@ -23,8 +25,11 @@ class EventLineSchema(ma.SQLAlchemyAutoSchema):
 
 
 class EventRegistrationSchema(ma.SQLAlchemyAutoSchema):
+    registration_type = EnumField(RegistrationType, by_value=True)
     class Meta:
         model = EventRegistrationModel
+
+        fields = ('id', 'registration_id', 'registration_type', 'name', 'email', 'phone', 'on_behalf')
 
 class ListEventRegistrationSchema(ma.SQLAlchemyAutoSchema):
     data = fields.Nested(EventRegistrationSchema, many=True)
@@ -36,6 +41,6 @@ class ListEventRegistrationSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = EventRegistrationModel
 
-class EventSouvenirClaimModel(ma.SQLAlchemyAutoSchema):
+class EventSouvenirClaimSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = EventSouvenirClaimModel
