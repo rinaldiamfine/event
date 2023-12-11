@@ -155,6 +155,7 @@ class EventRegistrationModel(BaseModel):
     registration_type = sa.Column(sa.Enum(RegistrationType, name='registration_type'))
     uuid = sa.Column(sa.String(50), nullable=True)
     name = sa.Column(sa.String(50), nullable=False)
+    institution = sa.Column(sa.String(length=50), nullable=True)
     email = sa.Column(sa.String(150), nullable=False)
     phone = sa.Column(sa.String(20), nullable=True)
     on_behalf = sa.Column(sa.String(50), nullable=True)

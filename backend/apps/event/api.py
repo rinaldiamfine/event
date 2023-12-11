@@ -130,6 +130,7 @@ class EventRegistrationApi(MethodResource):
         "name": fields.Str(),
         "phone": fields.Str(),
         "email": fields.Str(),
+        "institution": fields.Str(),
         "on_behalf": fields.Str(required=False),
         "type": fields.Str()
     })

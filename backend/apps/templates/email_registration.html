@@ -8,9 +8,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-    <title>Event Registration</title>
+    <title>KONFIRMASI REGISTRASI</title>
 </head>
-
 <body class="body-wrapper" style="margin: 0;">
     <table class="table-wrapper"
         style="background: #F2F2F2; border-spacing: 0; color: #464646; font-family: 'Poppins','Helvetica','Arial',sans-serif; font-weight: 400; margin: 0; text-decoration: none; width: 100%;">
@@ -33,39 +32,44 @@
                                         <tbody>
                                             <tr>
                                                 <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
-                                                    <h4>Dear {{ username }},</h4>
-                                                    <p>Congratulations! Your reservation for the {{ event_name }} has been successfully confirmed.</p>
+                                                    <br/>
+                                                    <h4>KONFIRMASI REGISTRASI</h4>
+                                                    <p>Kepada Yth.</p>
+                                                    <p>{{ username }},</p>
+                                                    <p>{{ institution }}</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
+                                                    <p>Nomor Registrasi: <b>{{ registration_no }}</b></p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
+                                                    <p>Bapak/Ibu, terima kasih sudah melakukan registrasi dalam acara Indonesia Development Forum (IDF) 2023. Berikut barcode yang dapat digunakan saat melakukan re-registrasi.</p>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td align="center" class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
-                                                    <hr style="margin-top:24px;border:0;border-bottom:1px solid #c1c7d0">
                                                     <img src="{{ qr_code_link }}"/>
-                                                    <p style="margin-top:0px;">
-                                                        <b>{{ registration_no }}</b>
-                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
                                                     <hr style="margin-top:24px;border:0;border-bottom:1px solid #c1c7d0">
+                                                    <p>CATATAN PENTING:</p>
+                                                    <ol>
+                                                        <li>Re-registrasi dibuka pada tanggal 18 Desember 2023 pukul (07.30 – 08.45 WIB) di Radisson Golf & Convention Center Batam.</li>
+                                                        <li>Jika diperlukan informasi lebih lanjut silahkan menghubungi Sekretrariat IDF di <a href="mailto:sekretariat.idf@gmail.com">sekretariat.idf@gmail.com</a> ditujukan kepada Sdri. Anne atau dengan nomor (+62812 1486 1113).</li>
+                                                    </ol>
+                                                    <p>Demikian disampaikan. Atas perhatian dan kerjasamanya, diucapkan terima kasih.</p>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
-                                                    <p>Event Details:</p>
-                                                    <p>
-                                                        Date: {{ event_date }}<br/>
-                                                        Time: {{ event_time }}<br/>
-                                                        Venue: {{ event_venue }}
-                                                    </p>
-                                                    <p>Thank you for choosing to be part of this influential event. We look forward to your valuable contribution to the discussions on shaping the future of development in Indonesia.</p>
-                                                    <p>For any further inquiries, please feel free to contact us at info@gmail.com</p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
-                                                    <p>Best Regards,</p>
                                                     <br/>
-                                                    <p class="heading-title" style="color: #005da9; font-weight: 700;">
-                                                        Ministry of Industrial
-                                                    </p>
+                                                    <p>Sekretariat Indonesia Development Forum 2023</p>
+                                                    <br/>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -83,9 +87,13 @@
                         <tbody>
                             <tr>
                                 <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
-                                    <h5 class="bottom-text" style="font-weight: 400;">
-                                        Copyright © {{current_year}}, All rights
-                                        reserved by Batamtech.<br/><br/>
+                                    <p class="heading-title" style="font-weight: 700;">
+                                        Kementerian Perencanaan Pembangunan Nasional/<br/>
+                                        Badan Perencanaan Pembangunan Nasional (Bappenas)
+                                    </p>
+                                    <h5 class="bottom-text" style="font-weight: 400; margin-top: 0; padding-top: 0;">
+                                        Jalan Taman Suropati No.2, Jakarta Pusat<br/>
+                                        DKI Jakarta, Indonesia 10310<br/><br/>
                                     </h5>
                                 </td>
                             </tr>

@@ -38,6 +38,7 @@ def upgrade():
         sa.Column('name', sa.String(length=50), nullable=False),
         sa.Column('email', sa.String(length=150), nullable=False), ## Set nullable to false because we need to sent the invitation via email
         sa.Column('phone', sa.String(length=20), nullable=True),
+        sa.Column('institution', sa.String(length=50), nullable=True),
         sa.Column('on_behalf', sa.String(length=50), nullable=True),
         sa.Column('created_uid', sa.Integer(), nullable=False),
         sa.Column('updated_uid', sa.Integer(), nullable=False),
