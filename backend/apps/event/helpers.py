@@ -335,7 +335,7 @@ class EventRegistrationHelpers:
                 "data": {
                     "participant": result_participant_dump,
                     "attendance": result_attendance_dump,
-                    "cupon": []
+                    "coupon": []
                 },
             }
             return True, result
