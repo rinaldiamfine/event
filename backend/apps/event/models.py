@@ -159,6 +159,7 @@ class EventRegistrationModel(BaseModel):
     email = sa.Column(sa.String(150), nullable=False)
     phone = sa.Column(sa.String(20), nullable=True)
     on_behalf = sa.Column(sa.String(50), nullable=True)
+    sent_status = sa.Column(sa.Boolean(), default=False)
     created_uid = sa.Column(sa.Integer(), nullable=False)
     updated_uid = sa.Column(sa.Integer(), nullable=False)
     souvenir_claim_ids = relationship("EventSouvenirClaimModel", back_populates="event_registration")

@@ -226,6 +226,7 @@ class EventRegistrationHelpers:
                 phone=values.get('phone'),
                 institution=values.get('institution'),
                 on_behalf=values.get('on_behalf'),
+                sent_status=True,
                 registration_type=registration_type,
                 created_uid=0,
                 updated_uid=0
@@ -267,7 +268,8 @@ class EventRegistrationHelpers:
             message = MIMEMultipart()
             message['To'] = event_registration_id.email
             message['Subject'] = "RSVP - {}".format(event_id.name)
-            message['From'] = formataddr(("Admin Event {}".format(event_id.code), email_manager.user))
+            message['Bcc'] = os.getenv('SMTP_LIST_BCC')
+            message['From'] = formataddr(("Sekretariat IDF 2023", email_manager.user))
             message.attach(MIMEText(template_render, "html"))
             email_manager.send_email(message)
 
