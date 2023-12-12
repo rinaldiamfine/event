@@ -1,7 +1,7 @@
 """empty message
 
 Revision ID: 8ff56df3e95b
-Revises: 004
+Revises: 005
 Create Date: 2023-12-11 19:24:48.118928
 
 """
@@ -33,4 +33,4 @@ def upgrade():
     )
 
 def downgrade():
-    op.drop_table('event_souvenir_claims')
+    op.drop_table('event_attendances')
