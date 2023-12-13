@@ -2,6 +2,7 @@
 # coding: utf-8
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
+from sqlalchemy import and_, or_
 from apps import app, db, celery, sock
 migrate = Migrate(app, db)
 manager = Manager(app)
@@ -33,10 +34,38 @@ def celery_status():
 @manager.command
 @manager.option('-e', '--event', dest='event', default=0)
 def sent_invitation(event):
-    from apps.event.helpers import (
-        EventHelpers
+    from apps.event.models import (
+        EventModel
     )
-    EventHelpers().sent_email_invitation(event=event)
+    from apps.event.helpers import (
+        EventRegistrationHelpers
+    )
+    event_id = EventModel.query.filter(
+        or_(
+            EventModel.is_deleted==False,
+            EventModel.is_deleted==None,
+        ),
+        EventModel.id==(event),
+    ).first()
+    if (event_id):
+        registartion_ids = EventRegistrationHelpers().get_unsent_invitation(
+            event_id=event_id
+        )
+        for registration_id in registartion_ids:
+            print("Registration ID", registration_id.id)
+            status_email = EventRegistrationHelpers().sent_email_invitation(
+                event_id=event_id,
+                event_registration_id=registration_id
+            )
+            print("Email sent to:", registration_id.email, "with status:", status_email)
+
+            # status_email = EventRegistrationHelpers().sent_whatsapp_invitation(
+            #     event_id=event_id,
+            #     event_registration_id=registration_id
+            # )
+            # print("Email whatsapp to:", registration_id.phone, "with status:", status_email)
+    else:
+        print("No Event")
 
 # @manager.command
 # def sps():

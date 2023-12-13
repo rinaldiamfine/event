@@ -3,6 +3,7 @@ import os
 import uuid
 import base64
 import pandas as pd
+import requests
 import segno
 from dotenv import load_dotenv
 from datetime import datetime
@@ -114,51 +115,6 @@ class EventHelpers:
         event_id.update(**values)
         return event_id
 
-    def sent_email_invitation(self, event=0):
-        print("send email invitations")
-        print("event_id:", event)
-        event_id = EventModel.query.filter(
-            EventModel.id==event,
-            or_(
-                EventModel.is_deleted==False,
-                EventModel.is_deleted==None,
-            )
-        ).first()
-        query_event_invitation_ids = EventInvitationModel.query.filter(
-            or_(
-                EventInvitationModel.is_deleted==False,
-                EventInvitationModel.is_deleted==None,
-            ),
-            EventInvitationModel.event_id==event
-        )
-        event_invitation_ids = query_event_invitation_ids.all()
-        email_manager = EmailManager()
-        load_path = os.path.join(os.getenv('BASE_PATH'), "apps", "templates")
-        file_load_env = Environment(
-            loader=FileSystemLoader(load_path)
-        )
-        email_template = file_load_env.get_template('email_invitation.html')
-        for invitation in event_invitation_ids:
-            print("invitation to:", invitation.email)
-            template_data = {
-                "username": invitation.name,
-                "event_name": event_id.name,
-                "event_date": event_id.event_date.strftime("%d %B %Y"),
-                "event_time": event_id.event_time,
-                "event_venue": event_id.venue,
-                "event_line_ids": event_id.event_line_ids,
-                "current_year": str(datetime.now().year),
-                "reservation_link": "---"
-            }
-            template_render = email_template.render(
-                template_data
-            )
-            message = MIMEMultipart()
-            message['To'] = invitation.email
-            message['Subject'] = "Invitation - {}".format(event_id.name)
-            message['From'] = formataddr(("Admin Event {}".format(event_id.code), email_manager.user))
-            message.attach(MIMEText(template_render, "html"))
-            email_manager.send_email(message)
 
 class EventLineHelpers:
     def __init__(
@@ -243,35 +199,10 @@ class EventRegistrationHelpers:
             event_registration_id.save()
 
             ## Send succesfully registration on email message
-            email_manager = EmailManager()
-            load_path = os.path.join(os.getenv('BASE_PATH'), "apps", "templates")
-            file_load_env = Environment(
-                loader=FileSystemLoader(load_path)
+            self.sent_email_invitation(
+                event_id=event_id, 
+                event_registration_id=event_registration_id
             )
-            email_template = file_load_env.get_template('email_registration.html')
-            filename = "{}.png".format(event_registration_id.uuid)
-            qr_store_path = os.path.join('qr-events', str(event_id.id), filename)
-            template_data = {
-                "qr_code_link": "{}/{}".format(os.getenv('APP_EVENT_URL'), qr_store_path),
-                "registration_no": event_registration_id.registration_id,
-                "username": event_registration_id.name,
-                "institution": event_registration_id.institution if event_registration_id.institution != None else "-",
-                "event_name": event_id.name,
-                "event_date": event_id.event_date.strftime("%d %B %Y"),
-                "event_time": event_id.event_time,
-                "event_venue": event_id.venue,
-                "current_year": str(datetime.now().year),
-            }
-            template_render = email_template.render(
-                template_data
-            )
-            message = MIMEMultipart()
-            message['To'] = event_registration_id.email
-            message['Subject'] = "RSVP - {}".format(event_id.name)
-            message['Bcc'] = os.getenv('SMTP_LIST_BCC')
-            message['From'] = formataddr(("Sekretariat IDF 2023", email_manager.user))
-            message.attach(MIMEText(template_render, "html"))
-            email_manager.send_email(message)
 
             result_dump = EventRegistrationSchema().dump(event_registration_id)
             result = {
@@ -281,6 +212,7 @@ class EventRegistrationHelpers:
             }
             return True, result
         except Exception as e:
+            print(e)
             return False, e
     
     def create_qr(self, values):
@@ -399,6 +331,87 @@ class EventRegistrationHelpers:
         print(event_registration_id.event_id, event_line_ids)
         return True, ""
     
+    def sent_email_invitation(self, event_id, event_registration_id):
+        email_manager = EmailManager()
+        load_path = os.path.join(os.getenv('BASE_PATH'), "apps", "templates")
+        file_load_env = Environment(
+            loader=FileSystemLoader(load_path)
+        )
+        email_template = file_load_env.get_template('email_registration.html')
+        filename = "{}.png".format(event_registration_id.uuid)
+        qr_store_path = os.path.join('qr-events', str(event_id.id), filename)
+        template_data = {
+            "qr_code_link": "{}/{}".format(os.getenv('APP_EVENT_URL'), qr_store_path),
+            "registration_no": event_registration_id.registration_id,
+            "username": event_registration_id.name,
+            "institution": event_registration_id.institution if event_registration_id.institution != None else "-",
+            "event_name": event_id.name,
+            "event_date": event_id.event_date.strftime("%d %B %Y"),
+            "event_time": event_id.event_time,
+            "event_venue": event_id.venue,
+            "registration_type": event_registration_id.registration_type,
+            "current_year": str(datetime.now().year),
+        }
+        template_render = email_template.render(
+            template_data
+        )
+        message = MIMEMultipart()
+        message['To'] = event_registration_id.email
+        message['Subject'] = "RSVP - {}".format(event_id.name)
+        message['Bcc'] = os.getenv('SMTP_LIST_BCC')
+        message['From'] = formataddr(("Sekretariat IDF 2023", email_manager.user))
+        message.attach(MIMEText(template_render, "html"))
+        email_manager.send_email(message)
+        return True
+
+    def sent_whatsapp_invitation(self, event_id, event_registration_id):
+        import json
+        # url = "{}/api/{}".format(
+        #     os.getenv('WHATSAPP_VENDOR_URL'),
+        #     os.getenv('WHATSAPP_DOCUMENT_PREFIX')
+        # )
+        # current_date = datetime.now()
+        # headers = {}
+        # payloads = {
+        #     "token": os.getenv('WHATSAPP_TOKEN'),
+        #     "number": '6282382284450',
+        #     # "file": "https://batamtech.com/event/assets/header-idf-banner.jpg",
+        #     "message": "*KONFIRMASI REGISTRASI* - Indonesia Development Forum (IDF) Tahun 2023 Batam, 18-19 Desember 2023",
+        #     "date": "{}-{}-{}".format(
+        #         current_date.year,
+        #         current_date.month,
+        #         current_date.day
+        #     ),
+        #     "time": "{}:{}:{}".format(
+        #         current_date.hour,
+        #         current_date.minute,
+        #         current_date.second
+        #     )
+        # }
+        # print(payloads)
+        # response = requests.request("POST", url, headers=headers, json=json.dumps(payloads))
+        # print(response.status_code)
+        # print(response.text)
+        url = "https://app.ruangwa.id/api/send_message"
+        payload='token=9g1YxPxbmi2XYAyq65N7APquUm2TRkrH&number=6282382284450&message=TESTEST&date=2023-12-13&time=10%3A23%3A32'
+        headers = {}
+
+        response = requests.request("POST", url, headers=headers, data=payload)
+        print(response.status_code)
+        print(response.text)
+        return True
+
+    def get_unsent_invitation(self, event_id):
+        query_event_registration_ids = EventRegistrationModel.query.filter(
+            or_(
+                EventRegistrationModel.is_deleted==False,
+                EventRegistrationModel.is_deleted==None,
+            ),
+            EventRegistrationModel.sent_status==False,
+            EventRegistrationModel.event_id==event_id.id
+        )
+        return query_event_registration_ids.all()
+
 class EventSouvenirClaimHelpers:
     def __init__(
         self,

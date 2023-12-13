@@ -36,12 +36,13 @@
                                                         style="max-width: 100%; height: auto;">
                                                     <h4>KONFIRMASI REGISTRASI</h4>
                                                     <p>Indonesia Development Forum (IDF) Tahun 2023<br/>Batam, 18-19 Desember 2023</p>
-                                                    <p>Kepada Yth.<br/>{{ username }},<br/>{{ institution }}</p>
+                                                    <!-- <p>Kepada Yth.<br/>{{ username }},<br/>{{ institution }}</p> -->
+                                                    <p>Kepada Yth.<br/>Dummy Name,<br/>Dummy Institution</p>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
-                                                    <p>Nomor Registrasi: <b>{{ registration_no }}</b></p>
+                                                    <p>Nomor Registrasi: <b>23IDFXXXXXX</b></p>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -51,15 +52,16 @@
                                             </tr>
                                             <tr>
                                                 <td align="center" class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
-                                                    <img src="{{ qr_code_link }}"/>
+                                                    <!-- <img src="{{ qr_code_link }}"/> -->
+                                                    <img src="https://batamtech.com/qr-events/1/b3842951-2e28-4d9b-b061-3bf555446f76.png"/>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
                                                     <p>Informasi lebih lengkap perihal kegiatan IDF 2023: <a href="https://linktr.ee/IDF2023Agenda">https://linktr.ee/IDF2023Agenda</a></p>
-                                                    {% if registration_type == 'SPEAKER' %}
+                                                    <!-- {% if registration_type == 'SPEAKER' %}
                                                         <p>Untuk narasumber yang belum upload materi presentasi, bisa di upload di link berikut: <a href="https://bit.ly/UploadPresentasiNarasumber">https://bit.ly/UploadPresentasiNarasumber</a></p>
-                                                    {% endif %}
+                                                    {% endif %} -->
                                                 </td>
                                             </tr>
                                             <tr>
