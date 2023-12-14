@@ -62,7 +62,7 @@ def generate_qr(event):
             )
             # registration_id.registration_id = reg_no
             # registration_id.uuid = uuid.uuid4()
-            registration_id.save()
+            # registration_id.save()
 
             print("Registration ID", registration_id.id)
             status_qr = EventRegistrationHelpers().generate_qr_code(
