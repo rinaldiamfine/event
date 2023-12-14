@@ -60,9 +60,10 @@ def generate_qr(event):
                 event_id.code,
                 str(event_sequence).zfill(5)
             )
-            # registration_id.registration_id = reg_no
-            # registration_id.uuid = uuid.uuid4()
-            # registration_id.save()
+            registration_id.registration_id = reg_no
+            registration_id.uuid = uuid.uuid4()
+            registration_id.save()
+            event_sequence += 1
 
             print("Registration ID", registration_id.id)
             status_qr = EventRegistrationHelpers().generate_qr_code(
@@ -70,7 +71,6 @@ def generate_qr(event):
                 event_id=event_id.id,
                 uuid=registration_id.uuid
             )
-            event_sequence += 1
 
         event_id.sequence = event_sequence
         event_id.save()
