@@ -209,3 +209,4 @@ pip-selfcheck.json
 # Logs related file
 logs/*
 qr/
+credentials.json

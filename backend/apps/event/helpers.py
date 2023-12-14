@@ -349,7 +349,7 @@ class EventRegistrationHelpers:
             "event_date": event_id.event_date.strftime("%d %B %Y"),
             "event_time": event_id.event_time,
             "event_venue": event_id.venue,
-            "registration_type": event_registration_id.registration_type,
+            "registration_type": event_registration_id.registration_type.name,
             "current_year": str(datetime.now().year),
         }
         template_render = email_template.render(

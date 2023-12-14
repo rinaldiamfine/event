@@ -33,6 +33,52 @@ def celery_status():
 
 @manager.command
 @manager.option('-e', '--event', dest='event', default=0)
+def generate_qr(event):
+    import uuid
+    from apps.event.models import (
+        EventModel
+    )
+    from apps.event.helpers import (
+        EventRegistrationHelpers
+    )
+    event_id = EventModel.query.filter(
+        or_(
+            EventModel.is_deleted==False,
+            EventModel.is_deleted==None,
+        ),
+        EventModel.id==(event),
+    ).first()
+    if (event_id):
+        registartion_ids = EventRegistrationHelpers().get_unsent_invitation(
+            event_id=event_id
+        )
+        event_sequence = event_id.sequence
+        for registration_id in registartion_ids:
+            reg_no = "{}{}{}".format(
+                ## 12IDF2300001
+                event_id.event_date.month,
+                event_id.code,
+                str(event_sequence).zfill(5)
+            )
+            registration_id.registration_id = reg_no
+            registration_id.uuid = uuid.uuid4()
+            registration_id.save()
+
+            print("Registration ID", registration_id.id)
+            status_qr = EventRegistrationHelpers().generate_qr_code(
+                message="{}".format(registration_id.registration_id),
+                event_id=event_id.id,
+                uuid=registration_id.uuid
+            )
+
+        event_id.sequence = event_sequence
+        event_id.save()
+            
+    else:
+        print("No Event")
+
+@manager.command
+@manager.option('-e', '--event', dest='event', default=0)
 def sent_invitation(event):
     from apps.event.models import (
         EventModel
@@ -57,6 +103,8 @@ def sent_invitation(event):
                 event_id=event_id,
                 event_registration_id=registration_id
             )
+            registration_id.sent_status = True
+            registration_id.save()
             print("Email sent to:", registration_id.email, "with status:", status_email)
 
             # status_email = EventRegistrationHelpers().sent_whatsapp_invitation(
