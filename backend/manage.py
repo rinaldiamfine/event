@@ -60,8 +60,8 @@ def generate_qr(event):
                 event_id.code,
                 str(event_sequence).zfill(5)
             )
-            registration_id.registration_id = reg_no
-            registration_id.uuid = uuid.uuid4()
+            # registration_id.registration_id = reg_no
+            # registration_id.uuid = uuid.uuid4()
             registration_id.save()
 
             print("Registration ID", registration_id.id)
@@ -70,6 +70,7 @@ def generate_qr(event):
                 event_id=event_id.id,
                 uuid=registration_id.uuid
             )
+            event_sequence += 1
 
         event_id.sequence = event_sequence
         event_id.save()
