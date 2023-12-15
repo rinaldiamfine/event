@@ -32,11 +32,11 @@
                                             <tr>
                                                 <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
                                                     <img alt="" 
-                                                        src="https://batamtech.com/event/assets/header-idf-banner.jpg"
+                                                        src="https://batamtech.com/event/assets/new-header-idf-banner.jpg"
                                                         style="max-width: 100%; height: auto;">
                                                     <h4>KONFIRMASI REGISTRASI</h4>
-                                                    <p>Indonesia Development Forum (IDF) Tahun 2023<br/>Batam, 18 - 19 Desember 2023</p>
-                                                    <p>Kepada Yth.<br/>{{ username }},<br/>{{ institution }}</p>
+                                                    <p>Indonesia Development Forum (IDF) Tahun 2023<br/>Kepulauan Riau, 18-19 Desember 2023</p>
+                                                    <p>Kepada Yth.<br/>{{ username }}<br/>{{ institution }}</p>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -56,9 +56,11 @@
                                             </tr>
                                             <tr>
                                                 <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
-                                                    <p>Informasi lebih lengkap perihal kegiatan IDF 2023: <a href="https://linktr.ee/IDF2023Agenda">https://linktr.ee/IDF2023Agenda</a></p>
+                                                    {% if registration_type == 'AUDIENCE' %}
+                                                        <p>Informasi lebih lengkap perihal kegiatan IDF 2023: <a href="https://linktr.ee/IDF2023Agenda">https://linktr.ee/IDF2023Agenda</a></p>
+                                                    {% endif %}
                                                     {% if registration_type == 'SPEAKER' %}
-                                                        <p>Untuk narasumber/moderator dapat upload materi presentasi pada link berikut: <a href="https://bit.ly/UploadPresentasiNarasumber">https://bit.ly/UploadPresentasiNarasumber</a></p>
+                                                        <p>Informasi lebih lengkap perihal kegiatan IDF 2023: <a href="https://linktr.ee/IDF2023Narasumber ">https://linktr.ee/IDF2023Narasumber </a></p>
                                                     {% endif %}
                                                 </td>
                                             </tr>
