@@ -1,0 +1,2 @@
+// For every 10 minutes
+*/10 * * * *
