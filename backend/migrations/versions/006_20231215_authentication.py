@@ -17,8 +17,21 @@ depends_on = None
 
 
 def upgrade():
-    pass
+    op.create_table(
+        'commite',
+        sa.Column('created', sa.DateTime(), nullable=True),
+        sa.Column('updated', sa.DateTime(), nullable=True),
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('name', sa.String(), nullable=False),
+        sa.Column('password', sa.String(), nullable=False),
+        sa.Column('role', sa.String(), nullable=False),
+        sa.Column('created_uid', sa.Integer(), nullable=False),
+        sa.Column('updated_uid', sa.Integer(), nullable=False),
+        sa.Column('is_deleted', sa.Boolean(), nullable=True),
+        sa.Column('deleted', sa.DateTime(), nullable=True),
+        sa.PrimaryKeyConstraint('id')
+    )
 
 
 def downgrade():
-    pass
+    op.drop_table('commite')
