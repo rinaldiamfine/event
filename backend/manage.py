@@ -95,7 +95,7 @@ def generate_pdf():
     file_load_env = Environment(
         loader=FileSystemLoader(load_path)
     )
-    email_template = file_load_env.get_template('email_registration.html')
+    email_template = file_load_env.get_template('pdf_registration.html')
     filename = "{}.png".format(event_registration_id.uuid)
     output_name = "{}.html".format(event_registration_id.uuid)
     pdfname = "{}.pdf".format(event_registration_id.uuid)
