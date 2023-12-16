@@ -434,7 +434,9 @@ Informasi lebih lengkap perihal kegiatan IDF 2023: https://linktr.ee/IDF2023Agen
 
 Demikian disampaikan. Atas perhatian dan kerjasamanya, diucapkan terima kasih.
 
-Sekretariat Indonesia Development Forum 2023'''.format(
+Sekretariat Indonesia Development Forum 2023
+
+Catatan: Tambahkan kekontak untuk mengaktifkan link pada pesan ini'''.format(
     event_registration_id.name,
     event_registration_id.institution,
     event_registration_id.registration_id
