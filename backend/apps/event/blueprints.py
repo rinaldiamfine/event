@@ -7,6 +7,7 @@ from apps.event.api import (
     EventRegistrationApi,
     EventRegistrationDetailApi,
     EventSouvenirClaimApi,
+    WhatsappApi,
 
     EventRegistrationCheckinApi,
     EventCouponApi,
@@ -28,9 +29,15 @@ event_souvenir_claim_blueprint = Blueprint(
 coupon_blueprint = Blueprint(
     'Coupon', __name__, url_prefix='/api/v1/coupon'
 )
+whatsapp_blueprint = Blueprint(
+    'Whatsapp', __name__, url_prefix='/api/v1/whatsapp'
+)
 
 event_api = Api(event_blueprint)
 event_api.add_resource(EventApi, '')
+
+whtasapp_api = Api(whatsapp_blueprint)
+whtasapp_api.add_resource(WhatsappApi, '')
 
 event_line_api = Api(event_line_blueprint)
 event_line_api.add_resource(EventLineApi, '')

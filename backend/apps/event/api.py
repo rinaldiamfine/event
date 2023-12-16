@@ -25,6 +25,39 @@ from flask_swagger import swagger
 
 api = Api(app)
 
+class WhatsappApi(MethodResource):
+    @use_kwargs({
+        "reg_id": fields.Str(),
+    })
+    def post(self, **kwargs):
+        try:
+            param = dict()
+            param['api'] = "/api/v1/whatsapp"
+            param['method'] = "POST"
+            status, result = EventRegistrationHelpers(**param).sent_whatsapp_invitation(kwargs)
+            if (status == False):
+                return Response(
+                    json.dumps({
+                        "success": False,
+                        "message": "Failed to sent the whatsapp",
+                        "error": result
+                    }),
+                    mimetype='application/json'
+                )
+            return Response(
+                json.dumps(
+                    result
+                ),
+                mimetype='application/json'
+            )
+        except Exception as e:
+            return Response(
+                json.dumps(str(e)),
+                status=http.client.INTERNAL_SERVER_ERROR,
+                mimetype='application/json'
+            )
+
+
 class EventApi(MethodResource):
     @use_kwargs({
         "name": fields.Str(),

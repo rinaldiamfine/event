@@ -398,42 +398,70 @@ class EventRegistrationHelpers:
         email_manager.send_email(message)
         return True
 
-    def sent_whatsapp_invitation(self, event_id, event_registration_id):
-        import json
-        # url = "{}/api/{}".format(
-        #     os.getenv('WHATSAPP_VENDOR_URL'),
-        #     os.getenv('WHATSAPP_DOCUMENT_PREFIX')
-        # )
-        # current_date = datetime.now()
-        # headers = {}
-        # payloads = {
-        #     "token": os.getenv('WHATSAPP_TOKEN'),
-        #     "number": '6282382284450',
-        #     # "file": "https://batamtech.com/event/assets/header-idf-banner.jpg",
-        #     "message": "*KONFIRMASI REGISTRASI* - Indonesia Development Forum (IDF) Tahun 2023 Batam, 18-19 Desember 2023",
-        #     "date": "{}-{}-{}".format(
-        #         current_date.year,
-        #         current_date.month,
-        #         current_date.day
-        #     ),
-        #     "time": "{}:{}:{}".format(
-        #         current_date.hour,
-        #         current_date.minute,
-        #         current_date.second
-        #     )
-        # }
-        # print(payloads)
-        # response = requests.request("POST", url, headers=headers, json=json.dumps(payloads))
-        # print(response.status_code)
-        # print(response.text)
-        url = "https://app.ruangwa.id/api/send_message"
-        payload='token=9g1YxPxbmi2XYAyq65N7APquUm2TRkrH&number=6282382284450&message=TESTEST&date=2023-12-13&time=10%3A23%3A32'
+    def sent_whatsapp_invitation(self, val: dict):
+        # 12IDF2300001
+        event_registration_id = EventRegistrationModel.query.filter(
+            EventRegistrationModel.registration_id==val.get('reg_id')
+        ).first()
+        url = "{}/api/{}".format(
+            os.getenv('WHATSAPP_VENDOR_URL'),
+            os.getenv('WHATSAPP_IMAGE_PREFIX'),
+        )
+        current_date = datetime.now()
         headers = {}
+        caption = '''*KONFIRMASI REGISTRASI*
+Indonesia Development Forum (IDF) Tahun 2023
+Kepulauan Riau, 18-19 Desember 2023
 
-        response = requests.request("POST", url, headers=headers, data=payload)
-        print(response.status_code)
+*Kepada Yth.*
+*{}*
+{}
+
+Nomor Registrasi: {}
+
+Bapak/Ibu, terima kasih sudah melakukan registrasi dalam acara Indonesia Development Forum (IDF) 2023. Di atas adalah barcode yang dapat digunakan saat melakukan re-registrasi.
+
+Informasi lebih lengkap perihal kegiatan IDF 2023: https://linktr.ee/IDF2023Agenda
+
+*_CATATAN PENTING:_*
+
+* Re-registrasi dibuka pada tanggal *18 Desember 2023 dari pukul 07.30 WIB* di Radisson Golf & Convention Center Batam.
+* Jika diperlukan informasi lebih lanjut silahkan menghubungi Sekretrariat IDF di sekretariat.idf@gmail.com ditujukan kepada Sdri. Anne atau dengan nomor (+62812 1486 1113 - hanya WA chat) 
+
+*Dresscode Acara*
+* Acara puncak: Smart Casual Nuansa Biru (dapat menggunakan celana/bawahan blue jeans)
+* ⁠Gala Dinner: Casual tema pakaian laut/baju pantai/nuansa kekayaan bahari dengan aksesoris pelengkap
+
+Demikian disampaikan. Atas perhatian dan kerjasamanya, diucapkan terima kasih.
+
+Sekretariat Indonesia Development Forum 2023'''.format(
+    event_registration_id.name,
+    event_registration_id.institution,
+    event_registration_id.registration_id
+)
+        payloads = {
+            "token": os.getenv('WHATSAPP_TOKEN'),
+            "number": "+6282382284450",
+            "file": "https://batamtech.com/qr-events/1/{}.png".format(event_registration_id.uuid),
+            "caption": caption,
+            "date": "{}-{}-{}".format(
+                current_date.year,
+                current_date.month,
+                current_date.day
+            ),
+            "time": "{}:{}:{}".format(
+                current_date.hour,
+                current_date.minute,
+                current_date.second
+            )
+        }
+        response = requests.request("POST", url, headers=headers, data=payloads)
         print(response.text)
-        return True
+        return True, {
+            "success": True,
+            "message": "Success sent",
+            "data": response.text,
+        }
 
     def get_unsent_invitation(self, event_id):
         query_event_registration_ids = EventRegistrationModel.query.filter(
