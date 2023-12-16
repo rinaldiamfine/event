@@ -28,6 +28,7 @@ api = Api(app)
 class WhatsappApi(MethodResource):
     @use_kwargs({
         "reg_id": fields.Str(),
+        "phone": fields.Str()
     })
     def post(self, **kwargs):
         try:
