@@ -99,7 +99,7 @@ def generate_pdf():
     filename = "{}.png".format(event_registration_id.uuid)
     output_name = "{}.html".format(event_registration_id.uuid)
     pdfname = "{}.pdf".format(event_registration_id.uuid)
-    qr_store_path = os.path.join(os.getenv('QR_PATH'), str(1), filename)
+    qr_store_path = os.path.join('qr-events', str(1), filename)
     html_store_path = os.path.join(os.getenv('QR_PATH'), str(1), output_name)
     pdf_store_path = os.path.join(os.getenv('QR_PATH'), str(1), pdfname)
     template_data = {
