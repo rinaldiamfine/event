@@ -2,7 +2,7 @@ from jinja2 import Environment, FileSystemLoader
 import os
 import uuid
 import base64
-import pandas as pd
+# import pandas as pd
 import requests
 import segno
 from dotenv import load_dotenv
