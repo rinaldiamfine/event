@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="x-apple-disable-message-reformatting">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <title>{{ registration_no }}</title>
+</head>
+<body class="body-wrapper" style="margin: 0;">
+    <table class="table-wrapper"
+        style="background: #F2F2F2; border-spacing: 0; color: #464646; font-family: 'Poppins','Helvetica','Arial',sans-serif; font-weight: 400; margin: 0; text-decoration: none; width: 100%;">
+        <tbody>
+            <tr class="background-wrapper"
+                style="background-repeat: no-repeat; background-size: 100% 200px;">
+                <td>
+                    <table align="center">
+                        <tbody>
+                            <tr class="text-center" style="text-align: center;">
+                                <td class="header-image" style="padding: 5px 0;">
+                                    <br/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <table align="center" class="content-wrapper"
+                                        style="background: #FFF; border-radius: 6px; padding: 20px; width: 600px;">
+                                        <tbody>
+                                            <tr>
+                                                <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
+                                                    <img alt="" 
+                                                        src="https://batamtech.com/event/assets/new-header-idf-banner.jpg"
+                                                        style="max-width: 100%; height: auto;">
+                                                    <h4>KONFIRMASI REGISTRASI</h4>
+                                                    <p>Indonesia Development Forum (IDF) Tahun 2023<br/>Kepulauan Riau, 18-19 Desember 2023</p>
+                                                    <p>Kepada Yth.<br/>{{ username }}<br/>{{ institution }}</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
+                                                    <p>Nomor Registrasi: <b>{{ registration_no }}</b></p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
+                                                    <p>Bapak/Ibu, terima kasih sudah melakukan registrasi dalam acara Indonesia Development Forum (IDF) 2023. Berikut barcode yang dapat digunakan saat melakukan re-registrasi.</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td align="center" class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
+                                                    <img src="{{ qr_code_link }}"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
+                                                    {% if registration_type == 'AUDIENCE' %}
+                                                        <p>Informasi lebih lengkap perihal kegiatan IDF 2023: <a href="https://linktr.ee/IDF2023Agenda">https://linktr.ee/IDF2023Agenda</a></p>
+                                                    {% endif %}
+                                                    {% if registration_type == 'SPEAKER' %}
+                                                        <p>Informasi lebih lengkap perihal kegiatan IDF 2023: <a href="https://linktr.ee/IDF2023Narasumber ">https://linktr.ee/IDF2023Narasumber </a></p>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
+                                                    <p>CATATAN PENTING:</p>
+                                                    <ol>
+                                                        <li>Re-registrasi dibuka pada tanggal 18 Desember 2023 dari pukul 07.30 WIB di Radisson Golf & Convention Center Batam.</li>
+                                                        <li>Jika diperlukan informasi lebih lanjut silahkan menghubungi Sekretrariat IDF di <a href="mailto:sekretariat.idf@gmail.com">sekretariat.idf@gmail.com</a> ditujukan kepada Sdri. Anne atau dengan nomor (+62812 1486 1113).</li>
+                                                    </ol>
+                                                    <p>Demikian disampaikan. Atas perhatian dan kerjasamanya, diucapkan terima kasih.</p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
+                                                    <br/>
+                                                    <p>Sekretariat Indonesia Development Forum 2023</p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <table align="center" class="bottom-wrapper"
+                        style="text-align: center; width: 600px;">
+                        <tbody>
+                            <tr>
+                                <td class="custom-font" style="font-family: 'Poppins','Helvetica','Arial',sans-serif;">
+                                    <p class="heading-title" style="font-weight: 700;">
+                                        Kementerian Perencanaan Pembangunan Nasional/<br/>
+                                        Badan Perencanaan Pembangunan Nasional (Bappenas)
+                                    </p>
+                                    <h5 class="bottom-text" style="font-weight: 400; margin-top: 0; padding-top: 0;">
+                                        Jalan Taman Suropati No.2, Jakarta Pusat<br/>
+                                        DKI Jakarta, Indonesia 10310<br/><br/>
+                                    </h5>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

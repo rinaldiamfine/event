@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
+import os
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from sqlalchemy import and_, or_
-from apps import app, db, celery, sock
+from apps import app, db, celery
 migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
@@ -77,6 +78,48 @@ def generate_qr(event):
             
     else:
         print("No Event")
+
+@manager.command
+def generate_pdf():
+    print("GENERATE PDF")
+    import pdfkit
+    from jinja2 import Environment, FileSystemLoader
+    from apps.event.models import (
+        EventRegistrationModel
+    )
+    event_registration_id = EventRegistrationModel.query.filter(
+        EventRegistrationModel.id==1,
+    ).first()
+    print(event_registration_id)
+    load_path = os.path.join(os.getenv('BASE_PATH'), "apps", "templates")
+    file_load_env = Environment(
+        loader=FileSystemLoader(load_path)
+    )
+    email_template = file_load_env.get_template('email_registration.html')
+    filename = "{}.png".format(event_registration_id.uuid)
+    output_name = "{}.html".format(event_registration_id.uuid)
+    pdfname = "{}.pdf".format(event_registration_id.uuid)
+    qr_store_path = os.path.join(os.getenv('QR_PATH'), str(1), filename)
+    html_store_path = os.path.join(os.getenv('QR_PATH'), str(1), output_name)
+    pdf_store_path = os.path.join(os.getenv('QR_PATH'), str(1), pdfname)
+    template_data = {
+        "qr_code_link": "{}/{}".format(os.getenv('APP_EVENT_URL'), qr_store_path),
+        "registration_no": event_registration_id.registration_id,
+        "username": event_registration_id.name,
+        "institution": event_registration_id.institution if event_registration_id.institution != None else "-",
+        "registration_type": event_registration_id.registration_type.name,
+    }
+    template_render = email_template.render(
+        template_data
+    )
+    with open(html_store_path, "w") as text_file:
+        text_file.write(str(template_render))
+
+    # print(template_render)
+    pdfkit.from_file(
+        html_store_path,
+        pdf_store_path
+    )
 
 @manager.command
 @manager.option('-e', '--event', dest='event', default=0)
@@ -176,3 +219,4 @@ def sent_invitation(event):
 
 if __name__ == '__main__':
     manager.run()
+

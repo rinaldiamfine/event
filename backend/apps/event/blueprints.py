@@ -6,7 +6,6 @@ from apps.event.api import (
     EventLineApi,
     EventRegistrationApi,
     EventRegistrationDetailApi,
-    EventRegistrationDetailSocket,
     EventSouvenirClaimApi,
 
     EventRegistrationCheckinApi,
@@ -41,7 +40,6 @@ event_registration_api.add_resource(EventRegistrationApi, '')
 event_registration_api.add_resource(EventRegistrationCheckinApi, '/checkin')
 
 event_registration_api.add_resource(EventRegistrationDetailApi, '/<int:uid>')
-event_registration_api.add_resource(EventRegistrationDetailSocket, '/<int:event>/<int:uid>')
 
 event_souvenir_claim_api = Api(event_souvenir_claim_blueprint)
 event_souvenir_claim_api.add_resource(EventSouvenirClaimApi, '')

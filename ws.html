@@ -5,7 +5,6 @@
   </head>
   <body>
     <h1>Flask-Sock Demo</h1>
-    <p>Type <b>close</b> to end the connection.</p>
     <div id="log"></div>
     <br>
     <form id="form">
@@ -16,13 +15,9 @@
       const log = (text, color) => {
         document.getElementById('log').innerHTML += `<span style="color: ${color}">${text}</span><br>`;
       };
-
-      const socket = new WebSocket('ws://' + 'localhost:5000' + '/echo');
+      const socket = new WebSocket('ws://127.0.0.1:8000/socket/1');
       socket.addEventListener('message', ev => {
         log('<<< ' + ev.data, 'blue');
-      });
-      socket.addEventListener('close', ev => {
-        log('<<< closed');
       });
       document.getElementById('form').onsubmit = ev => {
         ev.preventDefault();

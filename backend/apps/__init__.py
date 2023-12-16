@@ -7,7 +7,6 @@ from flask_caching import Cache
 from dotenv import load_dotenv
 from flask_marshmallow import Marshmallow
 from apps.blueprint_loaders import BlueprintLoaders
-from flask_sock import Sock
 
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
@@ -18,10 +17,8 @@ app = Flask(__name__)
 CORS(app)
 
 load_dotenv()
-app.debug = os.getenv("FLASK_DEBUG")
+app.debug = False
 app.env = os.getenv("FLASK_ENV")
-app.config['SOCK_SERVER_OPTIONS'] = {'ping_interval': 25}
-sock = Sock(app)
 
 SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
 SQLALCHEMY_BINDS = {
@@ -72,8 +69,3 @@ for blueprint in loader:
     except Exception as e:
         print(e, "FAILED")
         failed_imports.append(blueprint)
-
-# from akpusdafil.helpers.campaign_report import CampaignReport
-# from akpusdafil.campaigns.collecting import MasterCampaignReports
-
-import apps.models

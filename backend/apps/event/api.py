@@ -1,5 +1,5 @@
 from flask_restful import Api, Resource, reqparse
-from apps import app, sock
+from apps import app
 from flask_apispec import MethodResource, marshal_with, use_kwargs
 from apps.event.helpers import (
     EventHelpers,
@@ -211,16 +211,6 @@ class EventRegistrationDetailApi(MethodResource):
         status, result = EventRegistrationHelpers(**param).detail(uid)
         print(result, status)
         return result
-
-class EventRegistrationDetailSocket(MethodResource):
-    def get(self, event, uid):
-        param = dict()
-        # param['api'] = "/api/v1/event-registrations/{}".format(str(uid))
-        # param['method'] = "GET"
-        # status, result = EventRegistrationHelpers(**param).detail(uid)
-        # print(result, status)
-        # return result
-
 
 class EventSouvenirClaimApi(MethodResource):
     @use_kwargs({

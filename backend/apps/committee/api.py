@@ -1,5 +1,5 @@
 from flask_restful import Api, Resource, reqparse
-from apps import app, sock
+from apps import app
 from flask_apispec import MethodResource, marshal_with, use_kwargs
 from flask import Response, request
 from marshmallow import fields
