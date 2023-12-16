@@ -5,7 +5,8 @@ from apps.event.helpers import (
     EventHelpers,
     EventLineHelpers,
     EventRegistrationHelpers,
-    EventSouvenirClaimHelpers
+    EventSouvenirClaimHelpers,
+    CouponHelpers
 )
 from apps.event.schemas import (
     EventSchema,
@@ -233,3 +234,72 @@ class EventSouvenirClaimApi(MethodResource):
         param['method'] = "POST"
         status, result = EventSouvenirClaimHelpers(**param).create(kwargs)
         return result
+    
+
+class EventRegistrationCheckinApi(MethodResource):
+    @use_kwargs({
+        "coupon": fields.Str(),
+        "committee_id": fields.Int(),
+    })
+    def post(self, **kwargs):
+        try:
+            param = dict()
+            param['api'] = "/api/v1/participant/checkin"
+            param['method'] = "POST"
+            status, result = CouponHelpers(**param).checkin(kwargs)
+            if (status == False):
+                return Response(
+                    json.dumps({
+                        "success": False,
+                        "message": "Failed to checkin",
+                        "error": result
+                    }),
+                    mimetype='application/json'
+                )
+            return Response(
+                json.dumps(
+                    result
+                ),
+                mimetype='application/json'
+            )
+        except Exception as e:
+            print(e)
+            return Response(
+                json.dumps(str(e)),
+                status=http.client.INTERNAL_SERVER_ERROR,
+                mimetype='application/json'
+            )
+        
+class EventCouponApi(MethodResource):
+    @use_kwargs({
+        "coupon": fields.Str(),
+        "committee_id": fields.Int(),
+    })
+    def post(self, **kwargs):
+        try:
+            param = dict()
+            param['api'] = "/api/v1/coupon"
+            param['method'] = "POST"
+            status, result = CouponHelpers(**param).claim_coupons(kwargs)
+            if (status == False):
+                return Response(
+                    json.dumps({
+                        "success": False,
+                        "message": "Failed claim the coupon",
+                        "error": result
+                    }),
+                    mimetype='application/json'
+                )
+            return Response(
+                json.dumps(
+                    result
+                ),
+                mimetype='application/json'
+            )
+        except Exception as e:
+            print(e)
+            return Response(
+                json.dumps(str(e)),
+                status=http.client.INTERNAL_SERVER_ERROR,
+                mimetype='application/json'
+            )

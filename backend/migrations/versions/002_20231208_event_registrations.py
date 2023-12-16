@@ -44,6 +44,7 @@ def upgrade():
         sa.Column('updated_uid', sa.Integer(), nullable=False),
         sa.Column('is_attendance', sa.Boolean(), nullable=True),
         sa.Column('date_attendance', sa.DateTime(), nullable=True),
+        sa.Column('user_attendance', sa.String(length=50), nullable=True),
         sa.Column('registration_type', enum_registration_type),
         sa.Column('sent_status', sa.Boolean(), nullable=True),
         sa.Column('is_deleted', sa.Boolean(), nullable=True),

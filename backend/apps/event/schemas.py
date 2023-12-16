@@ -29,7 +29,7 @@ class EventRegistrationSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = EventRegistrationModel
 
-        fields = ('id', 'registration_id', 'registration_type', 'name', 'email', 'phone', 'on_behalf')
+        fields = ('id', 'registration_id', 'registration_type', 'name', 'email', 'phone', 'on_behalf', 'institution')
 
 class ListEventRegistrationSchema(ma.SQLAlchemyAutoSchema):
     data = fields.Nested(EventRegistrationSchema, many=True)

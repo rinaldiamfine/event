@@ -19,10 +19,12 @@ from apps.event.models import (
     EventInvitationModel,
     EventRegistrationModel,
     EventSouvenirClaimModel,
+    CouponModel,
 
     ## Enum
     RegistrationType
 )
+from apps.committee.models import CommitteeModel
 from apps.event.schemas import (
     # Events
     EventSchema,
@@ -262,16 +264,48 @@ class EventRegistrationHelpers:
             )
             event_registration_id = query_event_registration_id.first()
             result_participant_dump = EventRegistrationSchema().dump(event_registration_id)
-            result_attendance_dump = None
             # if (event_registration_id.is_attendance == True):
             #     result_attendance_dump = EventRegistrationAttendanceSchema().dump(event_registration_id)
+            if not event_registration_id:
+                return True, {
+                    "success": False,
+                    "message": "QR code is not valid",
+                    "data": None
+                }
+            
+            seminarkit_id = CouponModel.query.filter(
+                CouponModel.coupon_id==event_registration_id.registration_id,
+                CouponModel.coupon_type=="seminar kit"
+            ).first()
+            souvenir_id = CouponModel.query.filter(
+                CouponModel.coupon_id==event_registration_id.registration_id,
+                CouponModel.coupon_type=="seminar kit"
+            ).first()
             result = {
                 "success": True,
                 "message": "Participant details successfully fetched",
                 "data": {
                     "participant": result_participant_dump,
-                    "attendance": result_attendance_dump,
-                    "coupon": []
+                    "checkin": {
+                        "datetime": str(event_registration_id.date_attendance) if (event_registration_id.date_attendance) else None,
+                        "checkinby": event_registration_id.user_attendance
+                    },
+                    "coupon": [
+                        {
+                            "status": True if seminarkit_id else False,
+                            "coupon_type": "seminar kit",
+                            "coupon_id": event_registration_id.registration_id,
+                            "scannedAt": str(seminarkit_id.created) if seminarkit_id else None,
+                            "scannedBy": seminarkit_id.user_scan if seminarkit_id else None
+                        },
+                        {
+                            "status": True if souvenir_id else False,
+                            "coupon_type": "souvenir",
+                            "coupon_id": event_registration_id.registration_id,
+                            "scannedAt": str(souvenir_id.created) if souvenir_id else None,
+                            "scannedBy": souvenir_id.user_scan if souvenir_id else None
+                        },
+                    ]
                 },
             }
             return True, result
@@ -449,3 +483,149 @@ class EventSouvenirClaimHelpers:
         )
         event_souvenir_id.save()
         return True, event_souvenir_id
+
+class CouponHelpers:
+    def __init__(
+        self,
+        api=None,
+        method=None,
+    ):
+        self.api = api
+        self.method = method
+
+    def checkin(self, values: dict):
+        try:
+            event_registration_id = EventRegistrationModel.query.filter(
+                or_(
+                    EventRegistrationModel.is_deleted==False,
+                    EventRegistrationModel.is_deleted==None,
+                ),
+                EventRegistrationModel.registration_id==values.get('coupon')
+            ).first()
+            committee_id = CommitteeModel.query.filter(
+                CommitteeModel.id==values.get('committee_id')
+            ).first()
+            if not committee_id:
+                return True, {
+                    "success": False,
+                    "message": "Committee is not valid",
+                    "data": None,
+                }
+            if event_registration_id:
+                coupon_id = CouponModel.query.filter(
+                    CouponModel.coupon_id==event_registration_id.registration_id,
+                    CouponModel.coupon_type=="seminar kit"
+                ).first()
+                if coupon_id:
+                    return True, {
+                        "success": False,
+                        "message": "You already checkin",
+                        "data": {
+                            "coupon_type": "seminar kit",
+                            "coupon_id": coupon_id.coupon_id,
+                            "scannedAt": str(coupon_id.created),
+                            "scannedBy": coupon_id.user_scan
+                        },
+                    }
+                else:
+                    create_coupon_id = CouponModel(
+                        coupon_id = event_registration_id.registration_id,
+                        coupon_type = "seminar kit",
+                        user_scan = committee_id.name,
+                        user_scan_id = committee_id.id
+                    )
+                    create_coupon_id.save()
+
+                    event_registration_id.date_attendance = datetime.now()
+                    event_registration_id.updated_uid = committee_id.id
+                    event_registration_id.user_attendance = committee_id.name
+                    event_registration_id.save()
+
+                    return True, {
+                        "success": True,
+                        "message": "Success checkin",
+                        "data": {
+                            "coupon_type": "seminar kit",
+                            "coupon_id": create_coupon_id.coupon_id,
+                            "scannedAt": str(create_coupon_id.created),
+                            "scannedBy": create_coupon_id.user_scan
+                        },
+                    }
+            else:
+                return True, {
+                    "success": False,
+                    "message": "QR-Code is not valid",
+                    "data": None,
+                }
+    
+        except Exception as e:
+            return False, e
+        
+    def claim_coupons(self, values: dict):
+        try:
+            event_registration_id = EventRegistrationModel.query.filter(
+                or_(
+                    EventRegistrationModel.is_deleted==False,
+                    EventRegistrationModel.is_deleted==None,
+                ),
+                EventRegistrationModel.registration_id==values.get('coupon')
+            ).first()
+            committee_id = CommitteeModel.query.filter(
+                CommitteeModel.id==values.get('committee_id')
+            ).first()
+            if not committee_id:
+                return True, {
+                    "success": False,
+                    "message": "Committee is not valid",
+                    "data": None,
+                }
+            if event_registration_id:
+                coupon_id = CouponModel.query.filter(
+                    CouponModel.coupon_id==event_registration_id.registration_id,
+                    CouponModel.coupon_type=="souvenir"
+                ).first()
+                if coupon_id:
+                    create_coupon_id = CouponModel(
+                        coupon_id = event_registration_id.registration_id,
+                        coupon_type = "souvenir",
+                        user_scan = committee_id.name,
+                        user_scan_id = committee_id.id
+                    )
+                    create_coupon_id.save()
+                    return True, {
+                        "success": False,
+                        "message": "Coupon is claimed, but you can enter",
+                        "data": {
+                            "coupon_type": "souvenir",
+                            "coupon_id": coupon_id.coupon_id,
+                            "scannedAt": str(coupon_id.created),
+                            "scannedBy": coupon_id.user_scan
+                        },
+                    }
+                else:
+                    create_coupon_id = CouponModel(
+                        coupon_id = event_registration_id.registration_id,
+                        coupon_type = "souvenir",
+                        user_scan = committee_id.name,
+                        user_scan_id = committee_id.id
+                    )
+                    create_coupon_id.save()
+                    return True, {
+                        "success": True,
+                        "message": "Success claim coupon",
+                        "data": {
+                            "coupon_type": "souvenir",
+                            "coupon_id": create_coupon_id.coupon_id,
+                            "scannedAt": str(create_coupon_id.created),
+                            "scannedBy": create_coupon_id.user_scan
+                        },
+                    }
+            else:
+                return True, {
+                    "success": False,
+                    "message": "QR-Code is not valid",
+                    "data": None,
+                }
+    
+        except Exception as e:
+            return False, e

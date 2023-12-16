@@ -159,6 +159,8 @@ class EventRegistrationModel(BaseModel):
     email = sa.Column(sa.String(150), nullable=False)
     phone = sa.Column(sa.String(20), nullable=True)
     on_behalf = sa.Column(sa.String(50), nullable=True)
+    user_attendance = sa.Column(sa.String(50), nullable=True)
+    date_attendance = sa.Column(sa.DateTime(), nullable=True)
     sent_status = sa.Column(sa.Boolean(), default=False)
     created_uid = sa.Column(sa.Integer(), nullable=False)
     updated_uid = sa.Column(sa.Integer(), nullable=False)
@@ -241,3 +243,44 @@ class EventSouvenirClaimModel(BaseModel):
             db.session.rollback()
             raise Exception(e)
         
+
+class CouponModel(BaseModel):
+    __tablename__ = 'coupons'
+
+    coupon_id = sa.Column(sa.String(50), nullable=False)
+    coupon_type = sa.Column(sa.String(50), nullable=True)
+    user_scan = sa.Column(sa.String(50), nullable=True)
+    user_scan_id = sa.Column(sa.Integer(), nullable=False, default=0)
+
+    def __repr__(self):
+        return '<id : %s>' % (self.id)
+
+    def save(self):
+        try:
+            db.session.add(self)
+            db.session.commit()
+            return self
+
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(e)
+
+    def add_flush(self):
+        try:
+            db.session.add(self)
+            db.session.flush()
+            return self
+
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(e)
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+            return True
+
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(e)
