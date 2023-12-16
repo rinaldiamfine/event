@@ -441,7 +441,7 @@ Sekretariat Indonesia Development Forum 2023'''.format(
 )
         payloads = {
             "token": os.getenv('WHATSAPP_TOKEN'),
-            "number": event_registration_id.phone,
+            "number": val.get('phone'),
             "file": "https://batamtech.com/qr-events/1/{}.png".format(event_registration_id.uuid),
             "caption": caption,
             "date": "{}-{}-{}".format(
