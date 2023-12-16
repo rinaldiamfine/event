@@ -436,7 +436,7 @@ Demikian disampaikan. Atas perhatian dan kerjasamanya, diucapkan terima kasih.
 
 Sekretariat Indonesia Development Forum 2023
 
-Catatan: Tambahkan kekontak untuk mengaktifkan link pada pesan ini'''.format(
+Catatan: Tambahkan nomor ini ke kontak anda untuk mengaktifkan link pada pesan ini'''.format(
     event_registration_id.name,
     event_registration_id.institution,
     event_registration_id.registration_id
