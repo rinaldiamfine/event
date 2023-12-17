@@ -1,10 +1,11 @@
 from jinja2 import Environment, FileSystemLoader
 import os
 import uuid
-import base64
+import base64, json
 # import pandas as pd
 import requests
 import segno
+import websocket
 from dotenv import load_dotenv
 from datetime import datetime
 from sqlalchemy import and_, or_
@@ -526,14 +527,25 @@ class CouponHelpers:
         self.method = method
 
     def socket_trigger(self, id, name, institution):
-        url = os.getenv("WEBSOCKET_TRIGGER_ENDPOINT")
-        payloads = {
-            "id": id,
-            "name": name,
-            "institution": institution
-        }
-        headers = {}
-        response = requests.request("POST", url, headers=headers, json=payloads)
+        websocket_url = "ws://batamtech.com:8080"
+        ws = websocket.create_connection(websocket_url)
+        json_message = json.dumps(
+            {
+                "type": "chat2",
+                "nama": "Aji di 2222",
+                "instansi": "Energi"
+            }
+        )
+        ws.send(json_message)
+        ws.close()
+        # url = os.getenv("WEBSOCKET_TRIGGER_ENDPOINT")
+        # payloads = {
+        #     "id": id,
+        #     "name": name,
+        #     "institution": institution
+        # }
+        # headers = {}
+        # response = requests.request("POST", url, headers=headers, json=payloads)
         return True
 
     def checkin(self, values: dict):
