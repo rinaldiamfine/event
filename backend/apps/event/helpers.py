@@ -276,8 +276,9 @@ class EventRegistrationHelpers:
             
             seminarkit_id = CouponModel.query.filter(
                 CouponModel.coupon_id==event_registration_id.registration_id,
-                CouponModel.coupon_type=="seminar kit"
-            ).first()
+                CouponModel.coupon_type.ilike('%{}%'.format("seminar-kit"))
+            )
+            seminarkit_id = seminarkit_id.first()
             souvenir_id = CouponModel.query.filter(
                 CouponModel.coupon_id==event_registration_id.registration_id,
                 CouponModel.coupon_type=="souvenir"
@@ -294,7 +295,7 @@ class EventRegistrationHelpers:
                     "coupon": [
                         {
                             "status": True if seminarkit_id else False,
-                            "coupon_type": "seminar kit",
+                            "coupon_type": "seminar-kit",
                             "coupon_id": event_registration_id.registration_id,
                             "scannedAt": str(seminarkit_id.created) if seminarkit_id else None,
                             "scannedBy": seminarkit_id.user_scan if seminarkit_id else None
@@ -527,13 +528,13 @@ class CouponHelpers:
         self.method = method
 
     def socket_trigger(self, id, name, institution):
-        websocket_url = "ws://batamtech.com:8080"
+        websocket_url = os.getenv("WEBSOCKET_TRIGGER_ENDPOINT")
         ws = websocket.create_connection(websocket_url)
         json_message = json.dumps(
             {
-                "type": "chat2",
-                "nama": "Aji di 2222",
-                "instansi": "Energi"
+                "type": "{}".format(str(id)),
+                "nama": name,
+                "instansi": institution
             }
         )
         ws.send(json_message)
@@ -566,55 +567,60 @@ class CouponHelpers:
                     "message": "Committee is not valid",
                     "data": None,
                 }
-            if event_registration_id:
-                coupon_id = CouponModel.query.filter(
-                    CouponModel.coupon_id==event_registration_id.registration_id,
-                    CouponModel.coupon_type=="seminar kit"
-                ).first()
-                if coupon_id:
+            else:
+                role = committee_id.role
+                if event_registration_id:
+                    coupon_id = CouponModel.query.filter(
+                        CouponModel.coupon_id==event_registration_id.registration_id,
+                        CouponModel.coupon_type==role
+                    ).first()
+                    if coupon_id:
+                        if (os.getenv("WEBSOCKET_TRIGGER_ENDPOINT")):
+                            self.socket_trigger(committee_id.role, event_registration_id.name, event_registration_id.institution)
+
+                        return True, {
+                            "success": False,
+                            "message": "You already checkin",
+                            "data": {
+                                "coupon_type": role,
+                                "coupon_id": coupon_id.coupon_id,
+                                "scannedAt": str(coupon_id.created),
+                                "scannedBy": coupon_id.user_scan
+                            },
+                        }
+                    else:
+                        create_coupon_id = CouponModel(
+                            coupon_id = event_registration_id.registration_id,
+                            coupon_type = role,
+                            user_scan = committee_id.name,
+                            user_scan_id = committee_id.id
+                        )
+                        create_coupon_id.save()
+
+                        event_registration_id.date_attendance = datetime.now()
+                        event_registration_id.updated_uid = committee_id.id
+                        event_registration_id.user_attendance = committee_id.name
+                        event_registration_id.save()
+
+                        if (os.getenv("WEBSOCKET_TRIGGER_ENDPOINT")):
+                            self.socket_trigger(committee_id.role, event_registration_id.name, event_registration_id.institution)
+
+                        return True, {
+                            "success": True,
+                            "message": "Success checkin",
+                            "data": {
+                                "coupon_type": role,
+                                "coupon_id": create_coupon_id.coupon_id,
+                                "scannedAt": str(create_coupon_id.created),
+                                "scannedBy": create_coupon_id.user_scan
+                            },
+                        }
+                else:
                     return True, {
                         "success": False,
-                        "message": "You already checkin",
-                        "data": {
-                            "coupon_type": "seminar kit",
-                            "coupon_id": coupon_id.coupon_id,
-                            "scannedAt": str(coupon_id.created),
-                            "scannedBy": coupon_id.user_scan
-                        },
+                        "message": "QR-Code is not valid",
+                        "data": None,
                     }
-                else:
-                    create_coupon_id = CouponModel(
-                        coupon_id = event_registration_id.registration_id,
-                        coupon_type = "seminar kit",
-                        user_scan = committee_id.name,
-                        user_scan_id = committee_id.id
-                    )
-                    create_coupon_id.save()
-
-                    event_registration_id.date_attendance = datetime.now()
-                    event_registration_id.updated_uid = committee_id.id
-                    event_registration_id.user_attendance = committee_id.name
-                    event_registration_id.save()
-
-                    if (os.getenv("WEBSOCKET_TRIGGER_ENDPOINT")):
-                        self.socket_trigger(committee_id.id, event_registration_id.name, event_registration_id.institution)
-
-                    return True, {
-                        "success": True,
-                        "message": "Success checkin",
-                        "data": {
-                            "coupon_type": "seminar kit",
-                            "coupon_id": create_coupon_id.coupon_id,
-                            "scannedAt": str(create_coupon_id.created),
-                            "scannedBy": create_coupon_id.user_scan
-                        },
-                    }
-            else:
-                return True, {
-                    "success": False,
-                    "message": "QR-Code is not valid",
-                    "data": None,
-                }
 
         except Exception as e:
             return False, e
