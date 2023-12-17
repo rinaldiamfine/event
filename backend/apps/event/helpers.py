@@ -279,7 +279,7 @@ class EventRegistrationHelpers:
             ).first()
             souvenir_id = CouponModel.query.filter(
                 CouponModel.coupon_id==event_registration_id.registration_id,
-                CouponModel.coupon_type=="seminar kit"
+                CouponModel.coupon_type=="souvenir"
             ).first()
             result = {
                 "success": True,
@@ -326,7 +326,9 @@ class EventRegistrationHelpers:
                 ).limit(
                     params['limit']
                 )
-            event_registration_ids = query_event_registration_ids.all()
+            event_registration_ids = query_event_registration_ids.order_by(
+                    EventRegistrationModel.id.desc()
+            ).all()
             result_dump = EventRegistrationSchema(many=True).dump(event_registration_ids)
             result = {
                 "success": True,
@@ -523,6 +525,17 @@ class CouponHelpers:
         self.api = api
         self.method = method
 
+    def socket_trigger(self, id, name, institution):
+        url = os.getenv("WEBSOCKET_TRIGGER_ENDPOINT")
+        payloads = {
+            "id": id,
+            "name": name,
+            "institution": institution
+        }
+        headers = {}
+        response = requests.request("POST", url, headers=headers, json=payloads)
+        return True
+
     def checkin(self, values: dict):
         try:
             event_registration_id = EventRegistrationModel.query.filter(
@@ -571,6 +584,9 @@ class CouponHelpers:
                     event_registration_id.user_attendance = committee_id.name
                     event_registration_id.save()
 
+                    if (os.getenv("WEBSOCKET_TRIGGER_ENDPOINT")):
+                        self.socket_trigger(committee_id.id, event_registration_id.name, event_registration_id.institution)
+
                     return True, {
                         "success": True,
                         "message": "Success checkin",
@@ -587,7 +603,7 @@ class CouponHelpers:
                     "message": "QR-Code is not valid",
                     "data": None,
                 }
-    
+
         except Exception as e:
             return False, e
         

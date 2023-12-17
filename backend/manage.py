@@ -175,6 +175,19 @@ def sent_invitation(event):
         print("No Event")
 
 
+@manager.command
+@manager.option('-i', '--id', dest='id', default=0)
+@manager.option('-n', '--name', dest='name', default="")
+@manager.option('-in', '--institution', dest='institution', default="")
+def test_socket(id, name, institution):
+    from apps.event.helpers import (
+        CouponHelpers
+    )
+    sts = CouponHelpers().socket_trigger(
+        id, name, institution
+    )
+    print(sts)
+
 if __name__ == '__main__':
     manager.run()
 
