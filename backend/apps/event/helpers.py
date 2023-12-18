@@ -693,3 +693,69 @@ class CouponHelpers:
     
         except Exception as e:
             return False, e
+        
+    def report(self, values: dict):
+        total_registration = len(EventRegistrationModel.query.filter().all())
+        total_registration_speaker = len(EventRegistrationModel.query.filter(
+            EventRegistrationModel.registration_type==RegistrationType.SPEAKER
+        ).all())
+        total_registration_audience = len(EventRegistrationModel.query.filter(
+            EventRegistrationModel.registration_type==RegistrationType.AUDIENCE
+        ).all())
+        
+        total_checkin = len(EventRegistrationModel.query.filter(
+            EventRegistrationModel.user_attendance!=None
+        ).all())
+        total_checkin_speaker = len(EventRegistrationModel.query.filter(
+            EventRegistrationModel.user_attendance!=None,
+            EventRegistrationModel.registration_type==RegistrationType.SPEAKER
+        ).all())
+        total_checkin_audience = len(EventRegistrationModel.query.filter(
+            EventRegistrationModel.user_attendance!=None,
+            EventRegistrationModel.registration_type==RegistrationType.AUDIENCE
+        ).all())
+
+        total_souvenir_claim = len(CouponModel.query.filter(
+            CouponModel.coupon_type=='souvenir'
+        ).all())
+
+        total_attendance_ss1 = len(CouponModel.query.filter(
+            CouponModel.coupon_type=='special-session1'
+        ).all())
+        total_attendance_ss2 = len(CouponModel.query.filter(
+            CouponModel.coupon_type=='special-session2'
+        ).all())
+        total_attendance_ss3 = len(CouponModel.query.filter(
+            CouponModel.coupon_type=='special-session3'
+        ).all())
+        total_attendance_ss4 = len(CouponModel.query.filter(
+            CouponModel.coupon_type=='special-session4'
+        ).all())
+        total_attendance_ss5 = len(CouponModel.query.filter(
+            CouponModel.coupon_type=='special-session5'
+        ).all())
+        total_attendance_ss6 = len(CouponModel.query.filter(
+            CouponModel.coupon_type=='special-session6'
+        ).all())
+        return True, {
+            "success": True,
+            "message": "Report Fetched",
+            "data": {
+                "total_registration": total_registration,
+                "total_registration_speaker": total_registration_speaker,
+                "total_registration_audience": total_registration_audience,
+
+                "total_checkin": total_checkin,
+                "total_checkin_speaker": total_checkin_speaker,
+                "total_checkin_audience": total_checkin_audience,
+
+                "total_souvenir_claim": total_souvenir_claim,
+
+                "total_attendance_ss1": total_attendance_ss1,
+                "total_attendance_ss2": total_attendance_ss2,
+                "total_attendance_ss3": total_attendance_ss3,
+                "total_attendance_ss4": total_attendance_ss4,
+                "total_attendance_ss5": total_attendance_ss5,
+                "total_attendance_ss6": total_attendance_ss6
+            }
+        }

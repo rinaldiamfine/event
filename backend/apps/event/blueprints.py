@@ -11,6 +11,7 @@ from apps.event.api import (
 
     EventRegistrationCheckinApi,
     EventCouponApi,
+    EventReportApi
 )
 from flask_swagger import swagger
 
@@ -32,9 +33,16 @@ coupon_blueprint = Blueprint(
 whatsapp_blueprint = Blueprint(
     'Whatsapp', __name__, url_prefix='/api/v1/whatsapp'
 )
+report_blueprint = Blueprint(
+    'Report', __name__, url_prefix='/api/v1/report'
+)
 
 event_api = Api(event_blueprint)
 event_api.add_resource(EventApi, '')
+
+
+report_api = Api(report_blueprint)
+report_api.add_resource(EventReportApi, '')
 
 whtasapp_api = Api(whatsapp_blueprint)
 whtasapp_api.add_resource(WhatsappApi, '')

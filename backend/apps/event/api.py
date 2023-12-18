@@ -327,3 +327,33 @@ class EventCouponApi(MethodResource):
                 status=http.client.INTERNAL_SERVER_ERROR,
                 mimetype='application/json'
             )
+        
+class EventReportApi(MethodResource):
+    def get(self, **kwargs):
+        try:
+            param = dict()
+            param['api'] = "/api/v1/event-registrations"
+            param['method'] = "GET"
+            status, result = CouponHelpers(**param).report(kwargs)
+            if (status == False):
+                return Response(
+                    json.dumps({
+                        "success": False,
+                        "message": "Failed to get the report",
+                        "error": result
+                    }),
+                    mimetype='application/json'
+                )
+            return Response(
+                json.dumps(
+                    result
+                ),
+                mimetype='application/json'
+            )
+        except Exception as e:
+            print(e)
+            return Response(
+                json.dumps(str(e)),
+                status=http.client.INTERNAL_SERVER_ERROR,
+                mimetype='application/json'
+            )
